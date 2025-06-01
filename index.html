@@ -1,143 +1,111 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Уточка скучает ❤️</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Уточки скучают</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Roboto', Arial, sans-serif;
-      background: linear-gradient(to bottom, #ccefff, #ffffff);
+      background: linear-gradient(to bottom, #d0eaff, #ffffff);
+      font-family: 'Roboto', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #222;
+      justify-content: center;
+      min-height: 100vh;
     }
 
-    .top-counters {
+    .wrapper {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 10px;
       width: 100%;
-      margin-top: 30px;
+      max-width: 400px;
+      margin-top: 50px;
     }
 
     .card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 15px;
-      width: 90%;
-      max-width: 320px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 48%;
+      padding: 10px;
       text-align: center;
-      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .card video {
       width: 100%;
       border-radius: 12px;
-      display: none;
-      margin-bottom: 10px;
     }
 
     .label {
       font-weight: bold;
-      margin-top: 5px;
+      font-size: 16px;
+      margin-top: 8px;
     }
 
     .from {
       font-size: 12px;
-      color: #999;
-      margin-top: 4px;
+      color: #777;
     }
 
     .count {
-      font-size: 30px;
+      font-size: 24px;
       color: #229ED9;
       font-weight: bold;
+      margin-top: 5px;
     }
 
-    button {
-      margin: 20px 0 10px 0;
-      padding: 14px 30px;
-      font-size: 18px;
-      background-color: #229ED9;
-      color: white;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #1c90c7;
-    }
-
-    .counter {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #666;
+    /* Смещение окна “Вы” вверх */
+    .you {
+      margin-bottom: 30px;
     }
 
     @media (max-width: 500px) {
+      .wrapper {
+        flex-direction: row;
+        gap: 8px;
+      }
+
       .card {
-        width: 95%;
+        width: 46%;
       }
     }
   </style>
 </head>
 <body>
 
-  <div class="top-counters">
-    <div class="card">
-      <video id="video-friend" muted playsinline preload="auto" poster="duckmy.webp">
-        <source src="duckfreind.webm" type="video/webm">
-        Ваш браузер не поддерживает видео.
-      </video>
-      <div class="label">Мой ❤️</div>
-      <div class="from">от Мой:</div>
-      <div class="count">561</div>
-    </div>
-
-    <div class="card">
-      <video id="video-you" muted playsinline preload="auto" poster="duckmy.webp">
-        <source src="duckmy.webm" type="video/webm">
+  <div class="wrapper">
+    <!-- Окно Вы -->
+    <div class="card you">
+      <video autoplay muted loop playsinline>
+        <source src="duckmy.webm" type="video/webm" />
         Ваш браузер не поддерживает видео.
       </video>
       <div class="label">Вы</div>
-      <div class="from">от вас:</div>
+      <div class="from">от вас</div>
       <div class="count">791</div>
     </div>
+
+    <!-- Окно Мой -->
+    <div class="card">
+      <video autoplay muted loop playsinline>
+        <source src="duckfreind.webm" type="video/webm" />
+        Ваш браузер не поддерживает видео.
+      </video>
+      <div class="label">Мой ❤️</div>
+      <div class="from">от Мой</div>
+      <div class="count">561</div>
+    </div>
   </div>
-
-  <button onclick="playDuck()">Скучаю по тебе ❤️</button>
-  <div class="counter" id="tapCount">Нажали 0 раз</div>
-
-  <script>
-    let count = 0;
-    function playDuck() {
-      const videoYou = document.getElementById('video-you');
-      const videoFriend = document.getElementById('video-friend');
-      const tapCount = document.getElementById('tapCount');
-
-      videoYou.style.display = 'block';
-      videoFriend.style.display = 'block';
-
-      videoYou.currentTime = 0;
-      videoFriend.currentTime = 0;
-
-      videoYou.play();
-      videoFriend.play();
-
-      count++;
-      tapCount.textContent = `Нажали ${count} раз`;
-    }
-  </script>
 
 </body>
 </html>
