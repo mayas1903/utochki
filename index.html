@@ -19,7 +19,9 @@
 
     .top-counters {
       display: flex;
-      justify-content: space-around;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
       width: 100%;
       margin-top: 30px;
     }
@@ -28,20 +30,23 @@
       background: #fff;
       border-radius: 18px;
       padding: 15px;
-      width: 120px;
+      width: 90%;
+      max-width: 320px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
       text-align: center;
+      position: relative;
     }
 
-    .card img {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+    .card video {
+      width: 100%;
+      border-radius: 12px;
+      display: none;
+      margin-bottom: 10px;
     }
 
     .label {
-      margin-top: 5px;
       font-weight: bold;
+      margin-top: 5px;
     }
 
     .from {
@@ -57,7 +62,7 @@
     }
 
     button {
-      margin: 15px 0 10px 0;
+      margin: 20px 0 10px 0;
       padding: 14px 30px;
       font-size: 18px;
       background-color: #229ED9;
@@ -79,49 +84,10 @@
       color: #666;
     }
 
-    .history {
-      width: 90%;
-      max-width: 400px;
-      margin-bottom: 90px;
-    }
-
-    .history h3 {
-      text-align: left;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-
-    .message {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 8px 0;
-      padding: 8px;
-      background: #f3f5f7;
-      border-radius: 12px;
-      font-size: 14px;
-    }
-
-    .info {
-      display: flex;
-      align-items: center;
-    }
-
-    .info img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .duck-container {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-    }
-
-    #duck {
-      width: 100px;
+    @media (max-width: 500px) {
+      .card {
+        width: 95%;
+      }
     }
   </style>
 </head>
@@ -129,62 +95,45 @@
 
   <div class="top-counters">
     <div class="card">
-      <img src="duckmy.webp" alt="Вы">
-      <div class="label">Вы</div>
-      <div class="from">от вас:</div>
-      <div class="count">791</div>
-    </div>
-
-    <div class="card">
-      <img src="duckmy.webp" alt="Мой">
+      <video id="video-friend" muted playsinline preload="auto" poster="duckmy.webp">
+        <source src="duckfreind.webm" type="video/webm">
+        Ваш браузер не поддерживает видео.
+      </video>
       <div class="label">Мой ❤️</div>
       <div class="from">от Мой:</div>
       <div class="count">561</div>
+    </div>
+
+    <div class="card">
+      <video id="video-you" muted playsinline preload="auto" poster="duckmy.webp">
+        <source src="duckmy.webm" type="video/webm">
+        Ваш браузер не поддерживает видео.
+      </video>
+      <div class="label">Вы</div>
+      <div class="from">от вас:</div>
+      <div class="count">791</div>
     </div>
   </div>
 
   <button onclick="playDuck()">Скучаю по тебе ❤️</button>
   <div class="counter" id="tapCount">Нажали 0 раз</div>
 
-  <div class="history">
-    <h3>Сегодня</h3>
-    <div class="message">
-      <div class="info">
-        <img src="duckmy.webp">
-        <span>Вы</span>
-      </div>
-      <span>11 ✈️</span>
-    </div>
-    <div class="message">
-      <div class="info">
-        <img src="duckmy.webp">
-        <span>Вы</span>
-      </div>
-      <span>27 ✈️</span>
-    </div>
-    <div class="message">
-      <div class="info">
-        <img src="duckmy.webp">
-        <span>Мой ❤️</span>
-      </div>
-      <span>13 ✈️</span>
-    </div>
-  </div>
-
-  <div class="duck-container">
-    <video id="duck" muted playsinline preload="auto" poster="duckmy.webp">
-      <source src="duckmy.webm" type="video/webm">
-      Ваш браузер не поддерживает видео.
-    </video>
-  </div>
-
   <script>
     let count = 0;
     function playDuck() {
-      const duck = document.getElementById('duck');
+      const videoYou = document.getElementById('video-you');
+      const videoFriend = document.getElementById('video-friend');
       const tapCount = document.getElementById('tapCount');
-      duck.currentTime = 0;
-      duck.play();
+
+      videoYou.style.display = 'block';
+      videoFriend.style.display = 'block';
+
+      videoYou.currentTime = 0;
+      videoFriend.currentTime = 0;
+
+      videoYou.play();
+      videoFriend.play();
+
       count++;
       tapCount.textContent = `Нажали ${count} раз`;
     }
