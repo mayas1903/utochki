@@ -7,6 +7,14 @@
   <title>Уточки</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+
     :root {
       --telegram-blue: #229ED9;
       --telegram-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -22,6 +30,8 @@
       font-family: var(--telegram-font);
       background: linear-gradient(to bottom, #c2e9fb, #ffffff);
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      height: 100vh;
+      overflow: hidden;
     }
 
     .container {
@@ -38,40 +48,36 @@
       height: 50vh;
     }
 
-  .user-block {
-  position: absolute;
-  top: 40px;         /* Расположение от верхнего края */
-  left: 20px;        /* Сдвиг ближе к уточке */
-  background: white;
-  border-radius: 16px;
-  padding: 16px;     /* ⬅️ 30px — слишком много, сделай 16px */
-  width: 120px;      /* ⬅️ чуть шире, чтобы влезала аватарка */
-  min-height: 130px; /* ⬅️ фиксируем комфортную высоту */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  z-index: 2;
-}
+    .user-block,
+    .friend-block {
+      position: absolute;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      width: 140px;
+      min-height: 160px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      z-index: 2;
+    }
 
-.friend-block {
-  position: absolute;
-  bottom: 30px;
-  right: 20px;
-  background: white;
-  border-radius: 16px;
-  padding: 16px;
-  width: 120px;
-  min-height: 130px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  z-index: 2;
-}
+    .user-block {
+      top: 40px;
+      left: 20px;
+    }
+
+    .friend-block {
+      bottom: 30px;
+      right: 20px;
+    }
+
     .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 6px;
-}
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 8px;
+    }
 
     .user-duck {
       position: absolute;
@@ -90,25 +96,21 @@
     }
 
     .block-content h3 {
-      font-size: 14px;
-      margin-bottom: 4px;
-    }
-
-    .block-content p {
-      font-size: 12px;
-      margin: 0;
+      font-size: 18px;
+      margin-bottom: 6px;
     }
 
     .big-number {
-      font-size: 22px;
+      font-size: 26px;
       font-weight: bold;
       color: var(--telegram-blue);
+      margin-top: 6px;
     }
 
     .btn {
       width: 100%;
-      padding: 10px;
-      font-size: 14px;
+      padding: 14px;
+      font-size: 16px;
       font-weight: bold;
       background-color: var(--telegram-blue);
       color: white;
@@ -119,7 +121,7 @@
 
     .progress-btn {
       margin-top: 12px;
-      padding: 10px;
+      padding: 12px;
       font-size: 15px;
       font-weight: bold;
       background-color: #fff;
@@ -181,39 +183,38 @@
   </style>
 </head>
 <body>
- <div class="container">
-  <div class="ducks">
-    
-    <!-- Окно Я -->
-    <div class="user-block">
-      <div class="block-content">
-        <img src="https://i.postimg.cc/XvpxmknG/IMG-1960.jpg" class="avatar" alt="Аватар Я">
-        <h3>Я</h3>
-        <p>от меня:</p>
-        <p class="big-number" id="myCount">0</p>
+  <div class="container">
+    <div class="ducks">
+
+      <!-- Блок Я -->
+      <div class="user-block">
+        <div class="block-content">
+          <img src="https://i.postimg.cc/XvpxmknG/IMG-1960.jpg" class="avatar" alt="Аватар Я">
+          <h3>Я</h3>
+          <p class="big-number" id="myCount">0 ✈️</p>
+        </div>
       </div>
-    </div>
-    <!-- Уточка Я -->
-    <img src="myduck.gif" class="user-duck" alt="Я уточка" />
-    <!-- Уточка Друг -->
-    <img src="friendduck.gif" class="friend-duck" alt="Друг уточка" />
-    <!-- Окно Друг -->
-    <div class="friend-block">
-      <div class="block-content">
-        <img src="https://i.postimg.cc/jjmvbnj8/IMG-1378.jpg" class="avatar" alt="Аватар Друг">
-        <h3>Друг</h3>
-        <p>от друга:</p>
-        <p class="big-number" id="friendCount">0</p>
+
+      <!-- Блок Друг -->
+      <div class="friend-block">
+        <div class="block-content">
+          <img src="https://i.postimg.cc/jjmvbnj8/IMG-1378.jpg" class="avatar" alt="Аватар Друг">
+          <h3>Друг</h3>
+          <p class="big-number" id="friendCount">0 ✈️</p>
+        </div>
       </div>
+
+      <!-- Уточки -->
+      <img src="myduck.gif" class="user-duck" alt="Я уточка" />
+      <img src="friendduck.gif" class="friend-duck" alt="Друг уточка" />
     </div>
 
-  </div>
-</div>
-
+    <!-- Кнопки -->
     <button class="btn" id="loveBtn" onclick="sendLove()">Скучаю по тебе ❤️</button>
     <button class="progress-btn" onclick="toggleModal()">Прогресс</button>
   </div>
 
+  <!-- Модалка -->
   <div class="modal" id="progressModal">
     <div class="modal-content">
       <h3>Прогресс</h3>
@@ -253,8 +254,8 @@
     }
 
     function updateUI() {
-      document.getElementById('myCount').textContent = state.fromMe;
-      document.getElementById('friendCount').textContent = state.fromFriend;
+      document.getElementById('myCount').textContent = state.fromMe + ' ✈️';
+      document.getElementById('friendCount').textContent = state.fromFriend + ' ✈️';
       document.getElementById('totalClicks').textContent = state.total;
     }
 
