@@ -36,8 +36,8 @@
   background: white;
   border-radius: 14px;
   padding: 10px;
-  width: 110px;            /* ⬅️ было 140px — уменьшили */
-  min-height: 110px;       /* ⬇️ адаптировано под уменьшенный контент */
+  width: 120px;            /* ⬅️ было 140px — уменьшили */
+  min-height: 120px;       /* ⬇️ адаптировано под уменьшенный контент */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   text-align: center;
   z-index: 2;
@@ -54,7 +54,7 @@
 }
 
 .avatar {
-  width: 52px;              /* ⬇️ было 60px — компактнее */
+  width: 54px;              /* ⬇️ было 60px — компактнее */
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
@@ -228,6 +228,11 @@
   border-left-color: #ccc;
   color: #aaa;
 }
+
+    .modal-img {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -282,6 +287,34 @@
   </div>
 </div>
 
+   <!-- Модалка Награда -->
+  <div class="modal" id="rewardModal">
+    <div class="modal-content">
+      <img src="plane.gif" class="modal-img" />
+      <h3>Ура! Вы накопили <span id="rewardLevel">1000</span> самолетиков!</h3>
+      <p>Вам доступен подарок</p>
+      <button onclick="claimReward()">Получить</button>
+    </div>
+  </div>
+
+  <!-- Модалка Ожидание -->
+  <div class="modal" id="waitingModal">
+    <div class="modal-content">
+      <img src="hourglass.gif" class="modal-img" />
+      <p>Обработка подарка...</p>
+    </div>
+  </div>
+
+  <!-- Модалка Приз -->
+  <div class="modal" id="prizeModal">
+    <div class="modal-content">
+      <img src="priz.gif" class="modal-img" />
+      <h3>Вы получили:</h3>
+      <p id="prizeText">Telegram Premium на 3 месяца</p>
+      <button onclick="toggleModal('prize')">Активировать</button>
+    </div>
+  </div>
+  
   <script>
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
@@ -307,13 +340,19 @@ socket.onmessage = (event) => {
   if (data.type === 'update') {
     state = data.payload;
     updateUI();
-    // 👇 Обновляем историю, если она пришла
     if (data.payload.history) {
       renderHistory(data.payload.history);
     }
   }
   if (data.type === 'plane') {
     createPlaneAnimation();
+  }
+  if (data.type === 'rewardGiven') {
+    const { level, reward } = data.payload;
+    rewardMap[level] = reward;
+    document.getElementById('prizeText').textContent = reward;
+    toggleModal('waiting');
+    toggleModal('prize');
   }
 };
 
@@ -322,6 +361,17 @@ socket.onmessage = (event) => {
       socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
       createPlaneAnimation();
     }
+    
+let lastRewardLevel = 0;
+const rewards = [
+  'Telegram Premium на 3 месяца',
+  'Telegram Premium на 1 месяц',
+  'Звезды 100 штук',
+  'Звезды 500 штук'
+];
+    
+let lastRewardLevel = 0;
+const rewardMap = {}; // уровень → текст награды
 
 function updateUI() {
   document.getElementById('myName').textContent = state.me.name;
@@ -351,12 +401,19 @@ function updateUI() {
     else if (i < level) item.classList.add('reached');
     else item.classList.add('locked');
 
-    item.textContent = `Уровень ${i}: ${i * 1000} ✈️`;
-    if (i === level && state.total >= i * 1000) {
-      item.textContent += " — 🎁 Подарок получен";
+    const base = `Уровень ${i}: ${i * 1000} ✈️`;
+    const prize = rewardMap[i];
+
+    if (prize) {
+      item.textContent = `${base} — 🎁 ${prize}`;
+    } else if (i === level && state.total >= i * 1000) {
+      item.textContent = `${base} — 🎁 Подарок получен`;
     } else if (i === level) {
-      item.textContent += " — текущий";
+      item.textContent = `${base} — текущий`;
+    } else {
+      item.textContent = base;
     }
+
     list.appendChild(item);
   }
 
@@ -366,6 +423,12 @@ function updateUI() {
       <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
+
+  if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
+    lastRewardLevel += 1000;
+    document.getElementById('rewardLevel').textContent = lastRewardLevel;
+    toggleModal('reward');
+  }
 }
 
 function renderHistory(historyList) {
@@ -401,7 +464,24 @@ function createPlaneAnimation() {
   document.body.appendChild(plane);
   setTimeout(() => plane.remove(), 2000);
 }
+if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
+    lastRewardLevel += 1000;
+    document.getElementById('rewardLevel').textContent = lastRewardLevel;
+    toggleModal('reward');
+  }
+}
 
+function claimReward() {
+  toggleModal('reward');
+  toggleModal('waiting');
+
+  // Запрос на сервер для синхронизации награды
+  socket.send(JSON.stringify({
+    type: 'claimReward',
+    level: lastRewardLevel
+  }));
+}
+    
 function toggleModal(type) {
   const id = type === 'level' ? 'levelModal' : 'progressModal';
   const modal = document.getElementById(id);
