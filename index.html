@@ -18,62 +18,55 @@
       padding: 0;
     }
 
-  body {
-  font-family: var(--telegram-font);
-  background: linear-gradient(to bottom, #c2e9fb, #ffffff);
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
+    body {
+      font-family: var(--telegram-font);
+      background: linear-gradient(to bottom, #c2e9fb, #ffffff);
+      height: 100vh;
+      overflow: hidden;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
 
-.container {
-  max-width: 430px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 50px 10px;
-}
-
-
-
-    .ducks {
+    .top-area {
+      height: 50vh;
+      padding: 10px;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      justify-content: start;
+      gap: 20px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
       gap: 10px;
-      margin-bottom: 30px;
     }
 
-    .user-block, .friend-block {
+    .user-window, .friend-window {
       background: white;
-      border-radius: 16px;
-      width: 48%;
-      padding: 16px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .duck-inside {
-      width: 100%;
       border-radius: 12px;
-    }
-
-    .block-content {
-      text-align: center;
-      margin-top: 8px;
-    }
-
-    .block-content h3 {
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
-
-    .block-content p {
+      padding: 10px;
+      width: 100px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       font-size: 14px;
-      margin: 0;
+      text-align: center;
     }
 
-    .big-number {
-      font-size: 26px;
-      font-weight: bold;
-      color: var(--telegram-blue);
+    .user-duck {
+      height: 120px;
+    }
+
+    .friend-duck {
+      height: 80px;
+    }
+
+    .container {
+      max-width: 430px;
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 10px 20px;
     }
 
     .btn {
@@ -102,7 +95,7 @@
 
     .plane {
       position: absolute;
-      width: 60px; /* увеличили размер */
+      width: 60px;
       animation: fly 2s linear forwards;
       pointer-events: none;
       z-index: 1000;
@@ -152,26 +145,24 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="ducks">
-      <div class="user-block">
-        <img src="myduck.gif" class="duck-inside" alt="Я" />
-        <div class="block-content">
-          <h3>Я</h3>
-          <p>от меня:</p>
-          <p class="big-number" id="myCount">0</p>
-        </div>
+  <div class="top-area">
+    <div class="row">
+      <div class="user-window">
+        <div>Я</div>
+        <div id="myCount">0</div>
       </div>
-      <div class="friend-block">
-        <img src="friendduck.gif" class="duck-inside" alt="Друг" />
-        <div class="block-content">
-          <h3>Друг</h3>
-          <p>от друга:</p>
-          <p class="big-number" id="friendCount">0</p>
-        </div>
-      </div>
+      <img src="myduck.gif" class="user-duck" alt="Моя уточка" />
     </div>
+    <div class="row">
+      <div class="friend-window">
+        <div>Друг</div>
+        <div id="friendCount">0</div>
+      </div>
+      <img src="friendduck.gif" class="friend-duck" alt="Уточка друга" />
+    </div>
+  </div>
 
+  <div class="container">
     <button class="btn" id="loveBtn" onclick="sendLove()">Скучаю по тебе ❤️</button>
     <button class="progress-btn" onclick="toggleModal()">Прогресс</button>
   </div>
@@ -202,16 +193,11 @@
         state = data.payload;
         updateUI();
       }
-      if (data.type === 'plane') {
-        const isMe = data.from === 'me';
-        createPlaneAnimation(isMe ? 'blue' : 'gray');
-      }
     };
 
     function sendLove() {
       socket.send(JSON.stringify({ type: 'click' }));
-      createPlaneAnimation('blue');
-      socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
+      createPlaneAnimation();
     }
 
     function updateUI() {
@@ -220,7 +206,7 @@
       document.getElementById('totalClicks').textContent = state.total;
     }
 
-    function createPlaneAnimation(color = 'blue') {
+    function createPlaneAnimation() {
       const btn = document.getElementById('loveBtn');
       const rect = btn.getBoundingClientRect();
 
@@ -234,7 +220,7 @@
       plane.style.setProperty('--y', `${dy}px`);
 
       plane.style.left = `${rect.left + rect.width / 2 - 30}px`;
-      plane.style.top = `${rect.top - 20}px`;
+      plane.style.top = `${rect.top - 10}px`;
 
       document.body.appendChild(plane);
       setTimeout(() => plane.remove(), 2000);
