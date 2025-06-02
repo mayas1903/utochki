@@ -162,11 +162,11 @@
       100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(720deg); }
     }
 
-  .modal {
+ .modal {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.45);
   justify-content: center;
   align-items: center;
   z-index: 9999;
@@ -174,42 +174,44 @@
 
 .modal-content {
   background: #fff;
-  padding: 24px 20px;
-  border-radius: 20px;
-  max-width: 340px;
+  padding: 24px 18px;
+  border-radius: 16px;
   width: 90%;
+  max-width: 300px;
   text-align: center;
-  font-size: 17px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+  font-size: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
 .modal-content h3 {
-  font-size: 20px;
-  margin-bottom: 12px;
-  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 
 .modal-content p {
-  font-size: 16px;
+  font-size: 15px;
   margin-bottom: 12px;
+  color: #333;
 }
 
 .modal-content button {
-  margin-top: 16px;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: bold;
+  margin-top: 12px;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 600;
   background-color: #229ED9;
   color: white;
   border: none;
-  border-radius: 12px;
-  width: 100%;
+  border-radius: 10px;
+  width: auto;
+  min-width: 120px;
 }
 
 .modal-img {
-  max-width: 160px;
+  width: 160px;
   height: auto;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
     
  .level-list {
@@ -325,11 +327,9 @@
   </div>
 </div>
 
-<!-- Модалка ожидания: просто вращающийся ⏳ -->
+<!-- Модалка ожидания: просто ⏳ -->
 <div class="modal" id="waitingModal">
-  <div class="modal-content" style="font-size: 36px; animation: spin 1s linear infinite;">
-    ⏳
-  </div>
+  <div style="font-size: 60px; animation: spin 1s linear infinite;">⏳</div>
 </div>
 
 <!-- Модалка Приз -->
@@ -484,26 +484,35 @@
     setTimeout(() => plane.remove(), 2000);
   }
 
-function claimReward() {
-  toggleModal('reward');
-  toggleModal('waiting');
+let prizeReceived = false;
 
-  // Через 2 секунды покажем приз
+function claimReward() {
+  prizeReceived = false;
+  toggleModal('reward');   // Закрываем "вам доступен подарок"
+  toggleModal('waiting');  // Показываем ⏳
+  // Через 2 сек — либо приходит приз с сервера, либо fallback
   setTimeout(() => {
     toggleModal('waiting');
-
-    // На всякий случай — fallback если сервер не ответил
-    if (!document.getElementById('prizeModal').style.display || document.getElementById('prizeModal').style.display === 'none') {
+    if (!prizeReceived) {
+      // Fallback: если сервер не успел
       document.getElementById('prizeText').textContent = 'Telegram Premium на 1 месяц';
       toggleModal('prize');
     }
   }, 2000);
-
   socket.send(JSON.stringify({
     type: 'claimReward',
     level: lastRewardLevel
   }));
 }
+// Когда сервер присылает приз — показываем его
+socket.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === 'rewardGiven') {
+    prizeReceived = true;
+    document.getElementById('prizeText').textContent = data.payload.reward;
+    toggleModal('waiting'); // Закрыть ⏳, если ещё открыт
+    toggleModal('prize');   // Показать приз
+  }
 
   function toggleModal(type) {
     const idMap = {
