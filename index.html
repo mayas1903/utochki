@@ -196,18 +196,21 @@
 }
 
 .modal-content button {
-  padding: 10px 16px;
-  font-size: 15px;
+  padding: 10px 18px;
+  font-size: 16px;
   font-weight: 600;
   background-color: #229ED9;
   color: white;
   border: none;
-  border-radius: 10px;
-  width: 100%;
+  border-radius: 12px;
+  width: auto;
+  min-width: 140px;
+  cursor: pointer;
+  margin: 0 auto;
 }
 
 .modal-img {
-  width: 180px;
+  width: 230px;
   height: auto;
   margin-bottom: 12px;
 }
@@ -323,9 +326,9 @@
 <div class="modal" id="rewardModal">
   <div class="modal-content">
     <img src="plane.gif" class="modal-img" />
-    <h3>Ура! Вы накопили <span id="rewardLevel">1000</span> самолетиков!</h3>
+    <h3>🎉 Ура! Вы накопили <span id="rewardLevel">1000</span> самолетиков!</h3>
     <p>Вам доступен подарок</p>
-    <button onclick="claimReward()">Получить</button>
+    <button onclick="claimReward()">Получить 🤩</button>
   </div>
 </div>
 
@@ -338,9 +341,9 @@
 <div class="modal" id="prizeModal">
   <div class="modal-content">
     <img src="priz.gif" class="modal-img" />
-    <h3>Вы получили:</h3>
+    <h3>🎁 Вы получили:</h3>
     <p id="prizeText">Telegram Premium на 3 месяца</p>
-    <button onclick="toggleModal('prize')">Активировать</button>
+    <button onclick="toggleModal('prize')">АКТИВИРОВАТЬ</button>
   </div>
 </div>
   
