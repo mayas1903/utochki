@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Уточки</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -12,21 +12,11 @@
       overflow: hidden;
       overscroll-behavior: none;
       touch-action: none;
-    }
-    :root {
-      --telegram-blue: #229ED9;
-      --telegram-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: var(--telegram-font);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: linear-gradient(to bottom, #c2e9fb, #ffffff);
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
+
     .container {
       max-width: 430px;
       margin: 0 auto;
@@ -35,7 +25,12 @@
       gap: 16px;
       padding: 12px;
     }
-    .ducks { position: relative; height: 50vh; }
+
+    .ducks {
+      position: relative;
+      height: 50vh;
+    }
+
     .user-block, .friend-block {
       position: absolute;
       background: white;
@@ -47,8 +42,10 @@
       text-align: center;
       z-index: 2;
     }
+
     .user-block { top: 40px; left: 20px; }
     .friend-block { bottom: 30px; right: 20px; }
+
     .avatar {
       width: 64px;
       height: 64px;
@@ -56,63 +53,82 @@
       object-fit: cover;
       margin-bottom: 8px;
     }
+
     .user-duck, .friend-duck {
       position: absolute;
       height: 220px;
       z-index: 1;
     }
+
     .user-duck { top: 0; right: 0; }
     .friend-duck { bottom: 0; left: 0; }
-    .block-content h3 { font-size: 18px; margin-bottom: 6px; }
-    .big-number { font-size: 26px; font-weight: bold; color: var(--telegram-blue); margin-top: 6px; }
+
+    .block-content h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .big-number {
+      font-size: 26px;
+      font-weight: bold;
+      color: #229ED9;
+      margin-top: 6px;
+    }
+
     .btn {
       width: 70%;
       align-self: center;
       padding: 12px;
       font-size: 16px;
       font-weight: bold;
-      background-color: var(--telegram-blue);
+      background-color: #229ED9;
       color: white;
       border: none;
       border-radius: 14px;
     }
+
     .buttons-row {
       display: flex;
       gap: 10px;
       justify-content: center;
     }
+
     .progress-btn {
       flex: 1;
       padding: 10px;
       font-size: 15px;
       font-weight: bold;
       background-color: #fff;
-      color: var(--telegram-blue);
-      border: 2px solid var(--telegram-blue);
+      color: #229ED9;
+      border: 2px solid #229ED9;
       border-radius: 14px;
     }
+
     .progress-bar {
       width: 100%;
       height: 8px;
       background: #e0f3fa;
       border-radius: 4px;
       overflow: hidden;
-      margin-bottom: 4px;
     }
+
+    .progress-fill {
+      height: 100%;
+      background: #229ED9;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
     .progress-text {
       text-align: center;
       font-size: 14px;
       color: #555;
     }
-    .progress-fill {
-      height: 100%;
-      background: var(--telegram-blue);
-      width: 0%;
-      transition: width 0.3s ease;
-    }
+
     .history {
       margin-top: 10px;
     }
+
     .history-item {
       display: flex;
       align-items: center;
@@ -120,11 +136,13 @@
       font-size: 14px;
       margin-bottom: 6px;
     }
+
     .history-item img {
       width: 32px;
       height: 32px;
       border-radius: 50%;
     }
+
     .plane {
       position: absolute;
       width: 60px;
@@ -132,10 +150,12 @@
       pointer-events: none;
       z-index: 1000;
     }
+
     @keyframes fly {
       0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
       100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(720deg); }
     }
+
     .modal {
       display: none;
       position: fixed;
@@ -145,6 +165,7 @@
       align-items: center;
       z-index: 9999;
     }
+
     .modal-content {
       background: #fff;
       padding: 20px;
@@ -152,11 +173,25 @@
       max-width: 300px;
       text-align: center;
     }
-    .modal h3 { margin-bottom: 10px; }
+
+    .level-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #229ED9;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin: 0 auto 10px;
+      font-weight: bold;
+    }
+
     .modal button {
       margin-top: 10px;
       padding: 8px 16px;
-      background-color: var(--telegram-blue);
+      background-color: #229ED9;
       color: #fff;
       border: none;
       border-radius: 10px;
@@ -188,19 +223,29 @@
     <div class="progress-text" id="progressText">0 из 1000</div>
 
     <button class="btn" id="loveBtn" onclick="sendLove()">Скучаю по тебе ❤️</button>
+
     <div class="buttons-row">
-      <button class="progress-btn" onclick="toggleModal()">Прогресс</button>
-      <button class="progress-btn">Ваш уровень</button>
+      <button class="progress-btn" onclick="toggleModal('progress')">Прогресс</button>
+      <button class="progress-btn" onclick="toggleModal('level')" id="levelBtn">Ваш уровень: 1</button>
     </div>
 
     <div class="history" id="history"></div>
   </div>
 
+  <!-- Модалки -->
   <div class="modal" id="progressModal">
     <div class="modal-content">
       <h3>Прогресс</h3>
-      <p>Общее количество: <span id="totalClicks">0</span></p>
-      <button onclick="toggleModal()">Закрыть</button>
+      <p>Всего самолетиков: <span id="totalClicks">0</span></p>
+      <button onclick="toggleModal('progress')">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal" id="levelModal">
+    <div class="modal-content">
+      <div class="level-circle" id="levelCircle">1</div>
+      <p id="levelText">Чтобы получить подарок, достигните 1000 ✈️</p>
+      <button onclick="toggleModal('level')">Окей</button>
     </div>
   </div>
 
@@ -215,7 +260,11 @@
       avatar: tgUser.photo_url || 'https://via.placeholder.com/64'
     };
 
-    let state = { me: { name: myInfo.name, avatar: myInfo.avatar, count: 0 }, friend: { name: 'Друг', avatar: '', count: 0 }, total: 0 };
+    let state = {
+      me: { name: myInfo.name, avatar: myInfo.avatar, count: 0 },
+      friend: { name: 'Друг', avatar: '', count: 0 },
+      total: 0
+    };
 
     const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
     socket.onopen = () => socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
@@ -251,9 +300,17 @@
       const percent = Math.min((state.total / max) * 100, 100);
       document.getElementById('progressFill').style.width = `${percent}%`;
       document.getElementById('progressText').textContent = `${state.total} из ${max}`;
+      document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
+      document.getElementById('levelCircle').textContent = level;
+      document.getElementById('levelText').textContent = state.total >= max
+        ? `✅ Уровень ${level} достигнут!`
+        : `Чтобы получить подарок, достигните ${max} ✈️`;
 
-      const time = new Date().toLocaleTimeString();
-      const entry = `<div class="history-item"><img src="${myInfo.avatar}" /><div><strong>${myInfo.name}</strong><br><small>${time}</small> — +1 ✈️</div></div>`;
+      const entry = `
+        <div class="history-item">
+          <img src="${myInfo.avatar}" />
+          <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
+        </div>`;
       document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
     }
 
@@ -276,13 +333,13 @@
       setTimeout(() => plane.remove(), 2000);
     }
 
-    function toggleModal() {
-      const modal = document.getElementById('progressModal');
+    function toggleModal(type) {
+      const id = type === 'level' ? 'levelModal' : 'progressModal';
+      const modal = document.getElementById(id);
       modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+      modal.style.justifyContent = 'center';
+      modal.style.alignItems = 'center';
     }
-
-    document.getElementById('progressModal').style.justifyContent = 'center';
-    document.getElementById('progressModal').style.alignItems = 'center';
   </script>
 </body>
 </html>
