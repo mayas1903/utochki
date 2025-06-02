@@ -172,10 +172,13 @@
   <!-- Самолёт создаётся динамически -->
 
   <script>
- document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
-      Telegram.WebApp.expand();
+       Telegram.WebApp.expand();
+      if (Telegram.WebApp.requestFullscreen) {
+        Telegram.WebApp.requestFullscreen();
+      }
     }
   });
 
