@@ -53,9 +53,16 @@
   right: 20px;
 }
 
+.block-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+    
 .avatar {
   width: 58px;              /* ⬇️ было 60px — компактнее */
-  height: 48px;
+  height: 58px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 6px;
@@ -263,11 +270,6 @@
   border-left-color: #ccc;
   color: #aaa;
 }
-
-    .modal-img {
-      max-width: 100px;
-      margin-bottom: 10px;
-    }
   </style>
 </head>
 <body>
