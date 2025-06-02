@@ -36,8 +36,8 @@
   background: white;
   border-radius: 14px;
   padding: 10px;
-  width: 100px;            /* ⬅️ было 140px — уменьшили */
-  min-height: 100px;       /* ⬇️ адаптировано под уменьшенный контент */
+  width: 110px;            /* ⬅️ было 140px — уменьшили */
+  min-height: 110px;       /* ⬇️ адаптировано под уменьшенный контент */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   text-align: center;
   z-index: 2;
@@ -54,7 +54,7 @@
 }
 
 .avatar {
-  width: 48px;              /* ⬇️ было 60px — компактнее */
+  width: 52px;              /* ⬇️ было 60px — компактнее */
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
@@ -71,12 +71,12 @@
     .friend-duck { bottom: 0; left: 0; }
 
  .block-content h3 {
-  font-size: 14px;        /* было 18px — теперь лучше по масштабу */
+  font-size: 16px;        /* было 18px — теперь лучше по масштабу */
   margin-bottom: 4px;
 }
 
 .big-number {
-  font-size: 20px;        /* было 26px — меньше, но всё ещё заметно */
+  font-size: 24px;        /* было 26px — меньше, но всё ещё заметно */
   font-weight: bold;
   color: #229ED9;
   margin-top: 4px;
@@ -189,29 +189,45 @@
       border-radius: 10px;
     }
 
-    .level-list {
-      margin-top: 10px;
-      text-align: left;
-    }
+ .level-list {
+  margin-top: 10px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+}
 
-    .level-item {
-      margin-bottom: 8px;
-      font-size: 15px;
-    }
+.level-item {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f0f8ff;
+  border-left: 5px solid #229ED9;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .level-item.current {
-      font-weight: bold;
-      color: #229ED9;
-    }
+.level-item.reached {
+  background: #e6fce6;
+  border-left-color: #4CAF50;
+  font-weight: bold;
+  color: #333;
+}
 
-    .level-item.locked {
-      color: #aaa;
-    }
+.level-item.current {
+  background: #dcefff;
+  font-weight: bold;
+  color: #229ED9;
+}
 
-    .level-item.reached::after {
-      content: " ✅";
-      color: green;
-    }
+.level-item.locked {
+  background: #f2f2f2;
+  border-left-color: #ccc;
+  color: #aaa;
+}
   </style>
 </head>
 <body>
@@ -258,13 +274,13 @@
   </div>
 
   <!-- Модалка Уровень -->
-  <div class="modal" id="levelModal">
-    <div class="modal-content">
-      <h3>Уровни</h3>
-      <div id="levelsList" class="level-list"></div>
-      <button onclick="toggleModal('level')">Понял</button>
-    </div>
+ <div class="modal" id="levelModal">
+  <div class="modal-content">
+    <h3 style="margin-bottom: 12px;">Ваш уровень</h3>
+    <div id="levelList" class="level-list"></div>
+    <button onclick="toggleModal('level')">Окей</button>
   </div>
+</div>
 
   <script>
     Telegram.WebApp.ready();
@@ -307,50 +323,51 @@ socket.onmessage = (event) => {
       createPlaneAnimation();
     }
 
-    function updateUI() {
-      document.getElementById('myName').textContent = state.me.name;
-      document.getElementById('myAvatar').src = state.me.avatar;
-      document.getElementById('myCount').textContent = `${state.me.count} ✈️`;
+function updateUI() {
+  document.getElementById('myName').textContent = state.me.name;
+  document.getElementById('myAvatar').src = state.me.avatar;
+  document.getElementById('myCount').textContent = `${state.me.count} ✈️`;
 
-      document.getElementById('friendName').textContent = state.friend.name;
-      document.getElementById('friendAvatar').src = state.friend.avatar;
-      document.getElementById('friendCount').textContent = `${state.friend.count} ✈️`;
+  document.getElementById('friendName').textContent = state.friend.name;
+  document.getElementById('friendAvatar').src = state.friend.avatar;
+  document.getElementById('friendCount').textContent = `${state.friend.count} ✈️`;
 
-      document.getElementById('totalClicks').textContent = state.total;
+  document.getElementById('totalClicks').textContent = state.total;
 
-      const level = Math.floor(state.total / 1000) + 1;
-      const max = Math.min(level * 1000, 10000);
-      const percent = Math.min((state.total / max) * 100, 100);
-      document.getElementById('progressFill').style.width = `${percent}%`;
-      document.getElementById('progressText').textContent = `${state.total} из ${max}`;
-      document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
+  const level = Math.floor(state.total / 1000) + 1;
+  const max = Math.min(level * 1000, 10000);
+  const percent = Math.min((state.total / max) * 100, 100);
+  document.getElementById('progressFill').style.width = `${percent}%`;
+  document.getElementById('progressText').textContent = `${state.total} из ${max}`;
+  document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
 
-      // обновление уровней
-      const list = document.getElementById('levelsList');
-      list.innerHTML = "";
-      for (let i = 1; i <= 10; i++) {
-        const item = document.createElement('div');
-        item.className = 'level-item';
-        if (i === level) item.classList.add('current');
-        else if (i < level) item.classList.add('reached');
-        else item.classList.add('locked');
+  // обновление уровней
+  const list = document.getElementById('levelsList');
+  list.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    const item = document.createElement('div');
+    item.className = 'level-item';
+    if (i === level) item.classList.add('current');
+    else if (i < level) item.classList.add('reached');
+    else item.classList.add('locked');
 
-        item.textContent = `Уровень ${i}: ${i * 1000} ✈️`;
-        if (i === level && state.total >= i * 1000) {
-          item.textContent += " — 🎁 Подарок получен";
-        } else if (i === level) {
-          item.textContent += " — текущий";
-        }
-        list.appendChild(item);
-      }
-
-      const entry = `
-        <div class="history-item">
-          <img src="${myInfo.avatar}" />
-          <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
-        </div>`;
-      document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
+    item.textContent = `Уровень ${i}: ${i * 1000} ✈️`;
+    if (i === level && state.total >= i * 1000) {
+      item.textContent += " — 🎁 Подарок получен";
+    } else if (i === level) {
+      item.textContent += " — текущий";
     }
+    list.appendChild(item);
+  }
+
+  const entry = `
+    <div class="history-item">
+      <img src="${myInfo.avatar}" />
+      <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
+    </div>`;
+  document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
+}
+
 function renderHistory(historyList) {
   const container = document.getElementById('history');
   container.innerHTML = ''; // очищаем перед добавлением
@@ -366,32 +383,33 @@ function renderHistory(historyList) {
   }
 }
 
-    function createPlaneAnimation() {
-      const btn = document.getElementById('loveBtn');
-      const rect = btn.getBoundingClientRect();
+function createPlaneAnimation() {
+  const btn = document.getElementById('loveBtn');
+  const rect = btn.getBoundingClientRect();
 
-      const plane = document.createElement('img');
-      plane.src = 'самолет.gif';
-      plane.className = 'plane';
+  const plane = document.createElement('img');
+  plane.src = 'самолет.gif';
+  plane.className = 'plane';
 
-      const dx = (Math.random() - 0.5) * 400;
-      const dy = -150 - Math.random() * 200;
-      plane.style.setProperty('--x', `${dx}px`);
-      plane.style.setProperty('--y', `${dy}px`);
-      plane.style.left = `${rect.left + rect.width / 2 - 30}px`;
-      plane.style.top = `${rect.top - 20}px`;
+  const dx = (Math.random() - 0.5) * 400;
+  const dy = -150 - Math.random() * 200;
+  plane.style.setProperty('--x', `${dx}px`);
+  plane.style.setProperty('--y', `${dy}px`);
+  plane.style.left = `${rect.left + rect.width / 2 - 30}px`;
+  plane.style.top = `${rect.top - 20}px`;
 
-      document.body.appendChild(plane);
-      setTimeout(() => plane.remove(), 2000);
-    }
+  document.body.appendChild(plane);
+  setTimeout(() => plane.remove(), 2000);
+}
 
-    function toggleModal(type) {
-      const id = type === 'level' ? 'levelModal' : 'progressModal';
-      const modal = document.getElementById(id);
-      modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-      modal.style.justifyContent = 'center';
-      modal.style.alignItems = 'center';
-    }
+function toggleModal(type) {
+  const id = type === 'level' ? 'levelModal' : 'progressModal';
+  const modal = document.getElementById(id);
+  modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+  modal.style.justifyContent = 'center';
+  modal.style.alignItems = 'center';
+}
+    
   </script>
 </body>
 </html>
