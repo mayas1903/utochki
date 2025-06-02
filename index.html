@@ -122,23 +122,32 @@
 </head>
 <body>
 
+  <!-- Telegram Fullscreen expand -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.expand();
+      }
+    });
+  </script>
+
   <div class="chat-layout">
-    <!-- Верхняя уточка над левым окном -->
+    <!-- Верхняя уточка -->
     <video class="duck-top" autoplay muted loop playsinline>
       <source src="duckmy.webm" type="video/webm">
     </video>
 
-    <!-- Нижняя уточка под правым окном -->
+    <!-- Нижняя уточка -->
     <video class="duck-bottom" autoplay muted loop playsinline>
       <source src="duckfreind.webm" type="video/webm">
     </video>
 
-    <!-- Окно "Вы" -->
+    <!-- Левое окно -->
     <div class="chat-left">
       <div class="chat-bubble">Вы</div>
     </div>
 
-    <!-- Окно "Мой ❤️" -->
+    <!-- Правое окно -->
     <div class="chat-right">
       <div class="chat-bubble">Мой ❤️</div>
     </div>
@@ -153,7 +162,7 @@
     <div>Сегодня</div>
   </div>
 
-  <!-- Telegram-сообщения -->
+  <!-- Сообщения -->
   <div class="messages">
     <div class="msg"><span>Вы</span><span>11 ✈️</span></div>
     <div class="msg"><span>Вы</span><span>27 ✈️</span></div>
