@@ -195,25 +195,25 @@
 .modal-img {
   width: auto;
   height: 44vh;
-  max-height: 200px;
+  max-height: 170px;
   margin-bottom: 12px;
 }
 
 .modal-content h3 {
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 600;
   margin-bottom: 6px;
 }
 
 .modal-content p {
-  font-size: 16px;
+  font-size: 19px;
   color: #444;
   margin-bottom: 14px;
 }
 
 .modal-content button {
   padding: 10px 18px;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 600;
   background-color: #229ED9;
   color: white;
@@ -345,7 +345,7 @@
   <div class="modal-content">
     <img src="priz.gif" class="modal-img" />
     <h3>🎁 Вы получили:</h3>
-    <p id="prizeText">Telegram Premium на 3 месяца</p>
+<p id="prizeText"><strong>Telegram Premium на 3 месяца</strong></p>
     <button onclick="toggleModal('prize')">АКТИВИРОВАТЬ</button>
   </div>
 </div>
@@ -387,14 +387,13 @@ socket.onmessage = (event) => {
     createPlaneAnimation();
   }
 
-  if (data.type === 'rewardGiven') {
-    prizeReceived = true;
-    rewardMap[data.payload.level] = data.payload.reward;
-    document.getElementById('prizeText').textContent = data.payload.reward;
-    toggleModal('waiting'); // Закрываем ⏳
-    toggleModal('prize');   // Показываем приз
-  }
-};
+ if (data.type === 'rewardGiven') {
+  prizeReceived = true;
+  rewardMap[data.payload.level] = data.payload.reward;
+  document.getElementById('prizeText').innerHTML = `<strong>${data.payload.reward}</strong>`;
+  toggleModal('waiting'); // Закрываем ⏳
+  toggleModal('prize');   // Показываем приз
+}
 
 function sendLove() {
   socket.send(JSON.stringify({ type: 'click' }));
