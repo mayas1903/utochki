@@ -40,12 +40,13 @@
 
   .user-block {
   position: absolute;
-  top: 40px;       /* ⬇️ было: 0 → стало: 40px */
-  left: 20px;      /* ⬅️ ближе к уточке */
+  top: 40px;         /* Расположение от верхнего края */
+  left: 20px;        /* Сдвиг ближе к уточке */
   background: white;
   border-radius: 16px;
-  padding: 10px;
-  width: 100px;
+  padding: 16px;     /* ⬅️ 30px — слишком много, сделай 16px */
+  width: 120px;      /* ⬅️ чуть шире, чтобы влезала аватарка */
+  min-height: 130px; /* ⬅️ фиксируем комфортную высоту */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   z-index: 2;
@@ -53,22 +54,30 @@
 
 .friend-block {
   position: absolute;
-  bottom: 30px;    /* ⬆️ было: 0 → стало: 30px */
-  right: 20px;     /* ⬅️ ближе к уточке */
+  bottom: 30px;
+  right: 20px;
   background: white;
   border-radius: 16px;
-  padding: 10px;
-  width: 100px;
+  padding: 16px;
+  width: 120px;
+  min-height: 130px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   z-index: 2;
+}
+    .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 6px;
 }
 
     .user-duck {
       position: absolute;
       top: 0;
       right: 0;
-      height: 250px;
+      height: 200px;
       z-index: 1;
     }
 
@@ -76,7 +85,7 @@
       position: absolute;
       bottom: 0;
       left: 0;
-      height: 250px;
+      height: 200px;
       z-index: 1;
     }
 
@@ -172,26 +181,34 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="ducks">
-      <div class="user-block">
-        <div class="block-content">
-          <h3>Я</h3>
-          <p>от меня:</p>
-          <p class="big-number" id="myCount">0</p>
-        </div>
-      </div>
-      <img src="myduck.gif" class="user-duck" alt="Я уточка" />
-
-      <img src="friendduck.gif" class="friend-duck" alt="Друг уточка" />
-      <div class="friend-block">
-        <div class="block-content">
-          <h3>Друг</h3>
-          <p>от друга:</p>
-          <p class="big-number" id="friendCount">0</p>
-        </div>
+ <div class="container">
+  <div class="ducks">
+    
+    <!-- Окно Я -->
+    <div class="user-block">
+      <div class="block-content">
+        <img src="https://i.postimg.cc/XvpxmknG/IMG-1960.jpg" class="avatar" alt="Аватар Я">
+        <h3>Я</h3>
+        <p>от меня:</p>
+        <p class="big-number" id="myCount">0</p>
       </div>
     </div>
+    <!-- Уточка Я -->
+    <img src="myduck.gif" class="user-duck" alt="Я уточка" />
+    <!-- Уточка Друг -->
+    <img src="friendduck.gif" class="friend-duck" alt="Друг уточка" />
+    <!-- Окно Друг -->
+    <div class="friend-block">
+      <div class="block-content">
+        <img src="https://i.postimg.cc/jjmvbnj8/IMG-1378.jpg" class="avatar" alt="Аватар Друг">
+        <h3>Друг</h3>
+        <p>от друга:</p>
+        <p class="big-number" id="friendCount">0</p>
+      </div>
+    </div>
+
+  </div>
+</div>
 
     <button class="btn" id="loveBtn" onclick="sendLove()">Скучаю по тебе ❤️</button>
     <button class="progress-btn" onclick="toggleModal()">Прогресс</button>
