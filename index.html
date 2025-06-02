@@ -2,182 +2,223 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Уточки скучают</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Уточки</title>
   <style>
+    :root {
+      --telegram-blue: #229ED9;
+      --telegram-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
     body {
       margin: 0;
-      padding: 20px;
-      background: linear-gradient(to bottom, #d0eaff, #ffffff);
-      font-family: 'Roboto', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding: 0;
+      font-family: var(--telegram-font);
+      background: linear-gradient(to bottom, #c2e9fb, #ffffff);
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 20px 10px 80px;
       box-sizing: border-box;
     }
 
-    .chat-layout {
+    .ducks {
+      position: relative;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      position: relative;
-      width: 100%;
-      max-width: 400px;
-      height: 250px;
       margin-bottom: 40px;
     }
 
-    .chat-bubble {
-      background-color: #ffffff;
-      padding: 14px 20px;
-      border-radius: 18px;
-      font-weight: bold;
-      font-size: 16px;
-      max-width: 160px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    .user-block, .friend-block {
+      position: relative;
+      background: white;
+      padding: 16px;
+      border-radius: 16px;
+      width: 45%;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .chat-left {
+    .user-duck, .friend-duck {
       position: absolute;
-      top: 30px;
+      width: 90px;
+      z-index: 0;
+    }
+
+    .user-duck {
+      bottom: 90%;
       left: 0;
     }
 
-    .chat-right {
-      position: absolute;
-      top: 80px;
+    .friend-duck {
+      bottom: 90%;
       right: 0;
     }
 
-    .duck-top {
-      position: absolute;
-      top: -80px;
-      left: -30px;
-      width: 140px;
-      height: auto;
+    .block-content {
+      position: relative;
       z-index: 1;
+      text-align: center;
     }
 
-    .duck-bottom {
-      position: absolute;
-      bottom: -90px;
-      right: -30px;
-      width: 140px;
-      height: auto;
-      z-index: 1;
+    .block-content img.avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin-bottom: 4px;
     }
 
-    button {
-      padding: 14px 30px;
-      font-size: 17px;
-      background-color: #229ED9;
+    .block-content h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .block-content p {
+      margin: 2px 0;
+      font-size: 14px;
+    }
+
+    .big-number {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--telegram-blue);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: var(--telegram-blue);
       color: white;
       border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      margin: 20px 0;
+    }
+
+    .counter {
+      text-align: center;
+      font-size: 16px;
       margin-bottom: 10px;
     }
 
-    button:hover {
-      background-color: #1c90c7;
+    .history {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
-    .click-stats {
-      text-align: center;
-      font-size: 15px;
-      color: #333;
-      margin-bottom: 30px;
+    .history h4 {
+      margin: 0 0 10px;
+      font-size: 18px;
     }
 
-    .messages {
-      width: 100%;
-      max-width: 380px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .msg {
-      background-color: white;
-      padding: 10px 15px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    .history-item {
       display: flex;
       justify-content: space-between;
-      font-size: 15px;
+      align-items: center;
+      margin-bottom: 8px;
     }
 
-    @media (max-width: 420px) {
-      .chat-layout {
-        max-width: 100%;
-        height: 250px;
-      }
-      .duck-top, .duck-bottom {
-        width: 110px;
-      }
+    .history-item .left {
+      display: flex;
+      align-items: center;
+    }
+
+    .history-item .left img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .plane {
+      position: fixed;
+      width: 80px;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      z-index: 100;
     }
   </style>
 </head>
 <body>
 
-  <!-- Telegram Fullscreen expand -->
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.expand();
-      }
-    });
-  </script>
-
-  <div class="chat-layout">
-    <!-- Верхняя уточка -->
-    <video class="duck-top" autoplay muted loop playsinline>
-      <source src="duckmy.webm" type="video/webm">
-    </video>
-
-    <!-- Нижняя уточка -->
-    <video class="duck-bottom" autoplay muted loop playsinline>
-      <source src="duckfreind.webm" type="video/webm">
-    </video>
-
-    <!-- Левое окно -->
-    <div class="chat-left">
-      <div class="chat-bubble">Вы</div>
+<div class="container">
+  <div class="ducks">
+    <div class="user-block">
+      <img src="myduck.gif" class="user-duck" alt="Уточка Я">
+      <div class="block-content">
+        <img src="https://i.pravatar.cc/36?u=me" class="avatar" alt="Вы" />
+        <h3>Вы</h3>
+        <p>от вас:</p>
+        <p class="big-number">791</p>
+      </div>
     </div>
 
-    <!-- Правое окно -->
-    <div class="chat-right">
-      <div class="chat-bubble">Мой ❤️</div>
+    <div class="friend-block">
+      <img src="friendduck.gif" class="friend-duck" alt="Уточка Мой ❤️">
+      <div class="block-content">
+        <img src="https://i.pravatar.cc/36?u=friend" class="avatar" alt="Мой ❤️" />
+        <h3>Мой ❤️</h3>
+        <p>от Мой:</p>
+        <p class="big-number">561</p>
+      </div>
     </div>
   </div>
 
-  <!-- Кнопка -->
-  <button onclick="incrementCounter()">Скучаю по тебе ❤️</button>
+  <button class="btn" onclick="sendLove()">Скучаю по тебе ❤️</button>
+  <div class="counter">Нажали <span id="clickCount">77</span> раз</div>
 
-  <!-- Счётчик -->
-  <div class="click-stats">
-    <div id="clickCount">Нажали 77 раз</div>
-    <div>Сегодня</div>
+  <div class="history">
+    <h4>Сегодня</h4>
+    <div class="history-item">
+      <div class="left">
+        <img src="https://i.pravatar.cc/28?u=me" />
+        <span>Вы</span>
+      </div>
+      <span>11 ✈️</span>
+    </div>
+    <div class="history-item">
+      <div class="left">
+        <img src="https://i.pravatar.cc/28?u=me2" />
+        <span>Вы</span>
+      </div>
+      <span>27 ✈️</span>
+    </div>
+    <div class="history-item">
+      <div class="left">
+        <img src="https://i.pravatar.cc/28?u=friend" />
+        <span>Мой ❤️</span>
+      </div>
+      <span>13 ✈️</span>
+    </div>
   </div>
+</div>
 
-  <!-- Сообщения -->
-  <div class="messages">
-    <div class="msg"><span>Вы</span><span>11 ✈️</span></div>
-    <div class="msg"><span>Вы</span><span>27 ✈️</span></div>
-    <div class="msg"><span>Мой ❤️</span><span>13 ✈️</span></div>
-  </div>
+<img src="самолет.gif" class="plane" id="plane" alt="Самолет" />
 
-  <script>
-    let counter = 77;
-    const clickDisplay = document.getElementById("clickCount");
+<script>
+  let count = 77;
 
-    function incrementCounter() {
-      counter++;
-      clickDisplay.textContent = `Нажали ${counter} раз`;
-    }
-  </script>
+  function sendLove() {
+    count++;
+    document.getElementById("clickCount").textContent = count;
+
+    const plane = document.getElementById("plane");
+    plane.style.display = "block";
+    plane.style.animation = "fly 2s ease-out forwards";
+
+    setTimeout(() => {
+      plane.style.display = "none";
+      plane.style.animation = "";
+    }, 2000);
+  }
+</script>
 
 </body>
 </html>
