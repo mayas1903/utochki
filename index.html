@@ -8,6 +8,216 @@
 
   <!-- Подключение Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Уточки</title>
+
+  <!-- Подключение Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root {
+      --telegram-blue: #229ED9;
+      --telegram-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--telegram-font);
+      background: linear-gradient(to bottom, #c2e9fb, #ffffff);
+      height: 100vh;
+      overflow: hidden;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    .container {
+      max-width: 430px;
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 60px 10px 80px; /* увеличен верхний отступ */
+    }
+
+    .ducks {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .user-block, .friend-block {
+      background: white;
+      border-radius: 16px;
+      width: 48%;
+      padding: 16px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .duck-inside {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+    }
+
+    .block-content {
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .block-content h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .block-content p {
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .big-number {
+      font-size: 26px;
+      font-weight: bold;
+      color: var(--telegram-blue);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: var(--telegram-blue);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .counter {
+      text-align: center;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .history {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .history h4 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .plane {
+      position: fixed;
+      width: 70px;
+      z-index: 9999;
+      animation: fly 2s linear forwards;
+    }
+
+    @keyframes fly {
+      from {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(-50%) translateY(-300px);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="ducks">
+      <div class="user-block">
+        <img src="myduck.gif" class="duck-inside" alt="Я" />
+        <div class="block-content">
+          <h3>Я</h3>
+          <p>от меня:</p>
+          <p class="big-number" id="myCount">791</p>
+        </div>
+      </div>
+
+      <div class="friend-block">
+        <img src="friendduck.gif" class="duck-inside" alt="Друг" />
+        <div class="block-content">
+          <h3>Друг</h3>
+          <p>от друга:</p>
+          <p class="big-number">561</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="sendLove()">Скучаю по тебе ❤️</button>
+    <div class="counter">Нажали <span id="clickCount">77</span> раз</div>
+
+    <div class="history">
+      <h4>Сегодня</h4>
+      <div class="history-item"><span>Я</span><span>11 ✈️</span></div>
+      <div class="history-item"><span>Я</span><span>27 ✈️</span></div>
+      <div class="history-item"><span>Друг</span><span>13 ✈️</span></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand(); // делает приложение полноэкранным
+      }
+    });
+
+    let count = 77;
+
+    function sendLove() {
+      count++;
+      document.getElementById('clickCount').textContent = count;
+      document.getElementById('myCount').textContent = count;
+
+      const plane = document.createElement('img');
+      plane.src = 'самолет.gif';
+      plane.classList.add('plane');
+
+      const button = document.querySelector('.btn');
+      const rect = button.getBoundingClientRect();
+      plane.style.left = `${rect.left + rect.width / 2}px`;
+      plane.style.bottom = `${window.innerHeight - rect.top}px`;
+
+      const angle = (Math.random() - 0.5) * 90;
+      plane.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+
+      document.body.appendChild(plane);
+
+      setTimeout(() => {
+        plane.remove();
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
 
   <style>
     :root {
