@@ -316,179 +316,170 @@
   </div>
   
   <script>
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
+    <script>
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
 
-    const tgUser = Telegram.WebApp.initDataUnsafe?.user || {};
-    const myInfo = {
-      id: tgUser.id,
-      name: tgUser.first_name || 'Я',
-      avatar: tgUser.photo_url || 'https://via.placeholder.com/64'
-    };
+  const tgUser = Telegram.WebApp.initDataUnsafe?.user || {};
+  const myInfo = {
+    id: tgUser.id,
+    name: tgUser.first_name || 'Я',
+    avatar: tgUser.photo_url || 'https://via.placeholder.com/64'
+  };
 
-    let state = {
-      me: { name: myInfo.name, avatar: myInfo.avatar, count: 0 },
-      friend: { name: 'Друг', avatar: '', count: 0 },
-      total: 0
-    };
+  let state = {
+    me: { name: myInfo.name, avatar: myInfo.avatar, count: 0 },
+    friend: { name: 'Друг', avatar: '', count: 0 },
+    total: 0
+  };
 
-    const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
-    socket.onopen = () => socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
+  const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
+  socket.onopen = () => socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
 
-socket.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  if (data.type === 'update') {
-    state = data.payload;
-    updateUI();
-    if (data.payload.history) {
-      renderHistory(data.payload.history);
+  const rewardMap = {}; // уровень → текст награды
+  let lastRewardLevel = 0;
+
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === 'update') {
+      state = data.payload;
+      updateUI();
+      if (data.payload.history) {
+        renderHistory(data.payload.history);
+      }
     }
-  }
-  if (data.type === 'plane') {
-    createPlaneAnimation();
-  }
-  if (data.type === 'rewardGiven') {
-    const { level, reward } = data.payload;
-    rewardMap[level] = reward;
-    document.getElementById('prizeText').textContent = reward;
-    toggleModal('waiting');
-    toggleModal('prize');
-  }
-};
-
-    function sendLove() {
-      socket.send(JSON.stringify({ type: 'click' }));
-      socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
+    if (data.type === 'plane') {
       createPlaneAnimation();
     }
-    
-let lastRewardLevel = 0;
-const rewards = [
-  'Telegram Premium на 3 месяца',
-  'Telegram Premium на 1 месяц',
-  'Звезды 100 штук',
-  'Звезды 500 штук'
-];
+    if (data.type === 'rewardGiven') {
+      const { level, reward } = data.payload;
+      rewardMap[level] = reward;
+      document.getElementById('prizeText').textContent = reward;
+      toggleModal('waiting');
+      toggleModal('prize');
+    }
+  };
 
-const rewardMap = {}; // уровень → текст награды
+  function sendLove() {
+    socket.send(JSON.stringify({ type: 'click' }));
+    socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
+    createPlaneAnimation();
+  }
 
-function updateUI() {
-  document.getElementById('myName').textContent = state.me.name;
-  document.getElementById('myAvatar').src = state.me.avatar;
-  document.getElementById('myCount').textContent = `${state.me.count} ✈️`;
+  function updateUI() {
+    document.getElementById('myName').textContent = state.me.name;
+    document.getElementById('myAvatar').src = state.me.avatar;
+    document.getElementById('myCount').textContent = `${state.me.count} ✈️`;
 
-  document.getElementById('friendName').textContent = state.friend.name;
-  document.getElementById('friendAvatar').src = state.friend.avatar;
-  document.getElementById('friendCount').textContent = `${state.friend.count} ✈️`;
+    document.getElementById('friendName').textContent = state.friend.name;
+    document.getElementById('friendAvatar').src = state.friend.avatar;
+    document.getElementById('friendCount').textContent = `${state.friend.count} ✈️`;
 
-  document.getElementById('totalClicks').textContent = state.total;
+    document.getElementById('totalClicks').textContent = state.total;
 
-  const level = Math.floor(state.total / 1000) + 1;
-  const max = Math.min(level * 1000, 10000);
-  const percent = Math.min((state.total / max) * 100, 100);
-  document.getElementById('progressFill').style.width = `${percent}%`;
-  document.getElementById('progressText').textContent = `${state.total} из ${max}`;
-  document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
+    const level = Math.floor(state.total / 1000) + 1;
+    const max = Math.min(level * 1000, 10000);
+    const percent = Math.min((state.total / max) * 100, 100);
+    document.getElementById('progressFill').style.width = `${percent}%`;
+    document.getElementById('progressText').textContent = `${state.total} из ${max}`;
+    document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
 
-  // обновление уровней
-  const list = document.getElementById('levelList');
-  list.innerHTML = "";
-  for (let i = 1; i <= 10; i++) {
-    const item = document.createElement('div');
-    item.className = 'level-item';
-    if (i === level) item.classList.add('current');
-    else if (i < level) item.classList.add('reached');
-    else item.classList.add('locked');
+    // обновление уровней
+    const list = document.getElementById('levelList');
+    list.innerHTML = "";
+    for (let i = 1; i <= 10; i++) {
+      const item = document.createElement('div');
+      item.className = 'level-item';
+      if (i === level) item.classList.add('current');
+      else if (i < level) item.classList.add('reached');
+      else item.classList.add('locked');
 
-    const base = `Уровень ${i}: ${i * 1000} ✈️`;
-    const prize = rewardMap[i];
+      const base = `Уровень ${i}: ${i * 1000} ✈️`;
+      const prize = rewardMap[i];
 
-    if (prize) {
-      item.textContent = `${base} — 🎁 ${prize}`;
-    } else if (i === level && state.total >= i * 1000) {
-      item.textContent = `${base} — 🎁 Подарок получен`;
-    } else if (i === level) {
-      item.textContent = `${base} — текущий`;
-    } else {
-      item.textContent = base;
+      if (prize) {
+        item.textContent = `${base} — 🎁 ${prize}`;
+      } else if (i === level && state.total >= i * 1000) {
+        item.textContent = `${base} — 🎁 Подарок получен`;
+      } else if (i === level) {
+        item.textContent = `${base} — текущий`;
+      } else {
+        item.textContent = base;
+      }
+
+      list.appendChild(item);
     }
 
-    list.appendChild(item);
-  }
-
-  const entry = `
-    <div class="history-item">
-      <img src="${myInfo.avatar}" />
-      <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
-    </div>`;
-  document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
-
-  if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
-    lastRewardLevel += 1000;
-    document.getElementById('rewardLevel').textContent = lastRewardLevel;
-    toggleModal('reward');
-  }
-}
-
-function renderHistory(historyList) {
-  const container = document.getElementById('history');
-  container.innerHTML = ''; // очищаем перед добавлением
-
-  for (let entry of historyList) {
-    const html = `
+    const entry = `
       <div class="history-item">
-        <img src="${entry.avatar}" />
-        <div><strong>${entry.name}</strong><br><span>+${entry.amount} ✈️</span></div>
-      </div>
-    `;
-    container.insertAdjacentHTML('beforeend', html);
+        <img src="${myInfo.avatar}" />
+        <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
+      </div>`;
+    document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
+
+    // Показываем модалку награды при достижении нового уровня
+    if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
+      lastRewardLevel += 1000;
+      document.getElementById('rewardLevel').textContent = lastRewardLevel;
+      toggleModal('reward');
+    }
   }
-}
 
-function createPlaneAnimation() {
-  const btn = document.getElementById('loveBtn');
-  const rect = btn.getBoundingClientRect();
+  function renderHistory(historyList) {
+    const container = document.getElementById('history');
+    container.innerHTML = '';
+    for (let entry of historyList) {
+      const html = `
+        <div class="history-item">
+          <img src="${entry.avatar}" />
+          <div><strong>${entry.name}</strong><br><span>+${entry.amount} ✈️</span></div>
+        </div>`;
+      container.insertAdjacentHTML('beforeend', html);
+    }
+  }
 
-  const plane = document.createElement('img');
-  plane.src = 'самолет.gif';
-  plane.className = 'plane';
+  function createPlaneAnimation() {
+    const btn = document.getElementById('loveBtn');
+    const rect = btn.getBoundingClientRect();
 
-  const dx = (Math.random() - 0.5) * 400;
-  const dy = -150 - Math.random() * 200;
-  plane.style.setProperty('--x', `${dx}px`);
-  plane.style.setProperty('--y', `${dy}px`);
-  plane.style.left = `${rect.left + rect.width / 2 - 30}px`;
-  plane.style.top = `${rect.top - 20}px`;
+    const plane = document.createElement('img');
+    plane.src = 'самолет.gif';
+    plane.className = 'plane';
 
-  document.body.appendChild(plane);
-  setTimeout(() => plane.remove(), 2000);
-}
-if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
-    lastRewardLevel += 1000;
-    document.getElementById('rewardLevel').textContent = lastRewardLevel;
+    const dx = (Math.random() - 0.5) * 400;
+    const dy = -150 - Math.random() * 200;
+    plane.style.setProperty('--x', `${dx}px`);
+    plane.style.setProperty('--y', `${dy}px`);
+    plane.style.left = `${rect.left + rect.width / 2 - 30}px`;
+    plane.style.top = `${rect.top - 20}px`;
+
+    document.body.appendChild(plane);
+    setTimeout(() => plane.remove(), 2000);
+  }
+
+  function claimReward() {
     toggleModal('reward');
+    toggleModal('waiting');
+
+    socket.send(JSON.stringify({
+      type: 'claimReward',
+      level: lastRewardLevel
+    }));
   }
-}
 
-function claimReward() {
-  toggleModal('reward');
-  toggleModal('waiting');
-
-  // Запрос на сервер для синхронизации награды
-  socket.send(JSON.stringify({
-    type: 'claimReward',
-    level: lastRewardLevel
-  }));
-}
-    
-function toggleModal(type) {
-  const id = type === 'level' ? 'levelModal' : 'progressModal';
-  const modal = document.getElementById(id);
-  modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-  modal.style.justifyContent = 'center';
-  modal.style.alignItems = 'center';
-}
-    
+  function toggleModal(type) {
+    const idMap = {
+      level: 'levelModal',
+      progress: 'progressModal',
+      reward: 'rewardModal',
+      waiting: 'waitingModal',
+      prize: 'prizeModal'
+    };
+    const modal = document.getElementById(idMap[type]);
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+  }
   </script>
 </body>
 </html>
