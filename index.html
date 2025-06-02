@@ -38,37 +38,37 @@
       height: 50vh;
     }
 
-    .user-block {
-      position: absolute;
-      top: 0;
-      left: 0;
-      background: white;
-      border-radius: 16px;
-      padding: 10px;
-      width: 100px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      z-index: 2;
-    }
+  .user-block {
+  position: absolute;
+  top: 40px;       /* ⬇️ было: 0 → стало: 40px */
+  left: 20px;      /* ⬅️ ближе к уточке */
+  background: white;
+  border-radius: 16px;
+  padding: 10px;
+  width: 100px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  z-index: 2;
+}
 
-    .friend-block {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      background: white;
-      border-radius: 16px;
-      padding: 10px;
-      width: 100px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      z-index: 2;
-    }
+.friend-block {
+  position: absolute;
+  bottom: 30px;    /* ⬆️ было: 0 → стало: 30px */
+  right: 20px;     /* ⬅️ ближе к уточке */
+  background: white;
+  border-radius: 16px;
+  padding: 10px;
+  width: 100px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  z-index: 2;
+}
 
     .user-duck {
       position: absolute;
       top: 0;
       right: 0;
-      height: 140px;
+      height: 250px;
       z-index: 1;
     }
 
@@ -76,7 +76,7 @@
       position: absolute;
       bottom: 0;
       left: 0;
-      height: 120px;
+      height: 250px;
       z-index: 1;
     }
 
