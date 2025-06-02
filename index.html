@@ -188,7 +188,30 @@
       border: none;
       border-radius: 10px;
     }
+.modal-img {
+  max-width: 140px;
+  margin-bottom: 16px;
+}
 
+.modal h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.modal p {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.hourglass {
+  font-size: 48px;
+  animation: rotate 1.2s linear infinite;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
  .level-list {
   margin-top: 10px;
   text-align: left;
@@ -279,7 +302,7 @@
   </div>
 
   <!-- Модалка Уровень -->
- <div class="modal" id="levelModal">
+<div class="modal" id="levelModal">
   <div class="modal-content">
     <h3 style="margin-bottom: 12px;">Ваш уровень</h3>
     <div id="levelList" class="level-list"></div>
@@ -287,33 +310,33 @@
   </div>
 </div>
 
-   <!-- Модалка Награда -->
-  <div class="modal" id="rewardModal">
-    <div class="modal-content">
-      <img src="plane.gif" class="modal-img" />
-      <h3>Ура! Вы накопили <span id="rewardLevel">1000</span> самолетиков!</h3>
-      <p>Вам доступен подарок</p>
-      <button onclick="claimReward()">Получить</button>
-    </div>
+  <!-- Модалка Награда -->
+<div class="modal" id="rewardModal">
+  <div class="modal-content">
+    <img src="plane.gif" class="modal-img" />
+    <h3>Ура! Вы накопили <span id="rewardLevel">1000</span> самолетиков!</h3>
+    <p>Вам доступен подарок</p>
+    <button onclick="claimReward()">Получить</button>
   </div>
+</div>
 
-  <!-- Модалка Ожидание -->
-  <div class="modal" id="waitingModal">
-    <div class="modal-content">
-      <img src="hourglass.gif" class="modal-img" />
-      <p>Обработка подарка...</p>
-    </div>
+<!-- "Ожидание" — просто смайлик с анимацией -->
+<div class="modal" id="waitingModal">
+  <div class="modal-content">
+    <div class="hourglass">⏳</div>
+    <p>Обработка подарка...</p>
   </div>
+</div>
 
-  <!-- Модалка Приз -->
-  <div class="modal" id="prizeModal">
-    <div class="modal-content">
-      <img src="priz.gif" class="modal-img" />
-      <h3>Вы получили:</h3>
-      <p id="prizeText">Telegram Premium на 3 месяца</p>
-      <button onclick="toggleModal('prize')">Активировать</button>
-    </div>
+<!-- Модалка Приз -->
+<div class="modal" id="prizeModal">
+  <div class="modal-content">
+    <img src="priz.gif" class="modal-img" />
+    <h3>Вы получили:</h3>
+    <p id="prizeText">Telegram Premium на 3 месяца</p>
+    <button onclick="toggleModal('prize')">Активировать</button>
   </div>
+</div>
   
   <script>
     
@@ -388,27 +411,27 @@
     const list = document.getElementById('levelList');
     list.innerHTML = "";
     for (let i = 1; i <= 10; i++) {
-      const item = document.createElement('div');
-      item.className = 'level-item';
-      if (i === level) item.classList.add('current');
-      else if (i < level) item.classList.add('reached');
-      else item.classList.add('locked');
+  const item = document.createElement('div');
+  item.className = 'level-item';
+  if (i === level) item.classList.add('current');
+  else if (i < level) item.classList.add('reached');
+  else item.classList.add('locked');
 
-      const base = `Уровень ${i}: ${i * 1000} ✈️`;
-      const prize = rewardMap[i];
+  const base = `Уровень ${i}: ${i * 1000} ✈️`;
+  const prize = rewardMap[i];
 
-      if (prize) {
-        item.textContent = `${base} — 🎁 ${prize}`;
-      } else if (i === level && state.total >= i * 1000) {
-        item.textContent = `${base} — 🎁 Подарок получен`;
-      } else if (i === level) {
-        item.textContent = `${base} — текущий`;
-      } else {
-        item.textContent = base;
-      }
+  if (prize) {
+    item.textContent = `${base} — 🎁 ${prize}`;
+  } else if (i === level && state.total >= i * 1000) {
+    item.textContent = `${base} — 🎁 Подарок получен`;
+  } else if (i === level) {
+    item.textContent = `${base} — текущий`;
+  } else {
+    item.textContent = base;
+  }
 
-      list.appendChild(item);
-    }
+  list.appendChild(item);
+}
 
     const entry = `
       <div class="history-item">
@@ -418,7 +441,7 @@
     document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
 
     // Показываем модалку награды при достижении нового уровня
-    if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
+    if (state.total >= lastRewardLevel + 10 && state.total <= 10000) {
       lastRewardLevel += 1000;
       document.getElementById('rewardLevel').textContent = lastRewardLevel;
       toggleModal('reward');
