@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -36,16 +35,16 @@
       position: absolute;
       background: white;
       border-radius: 16px;
-      padding: 20px;
-      width: 130px;
+      padding: 16px;
+      width: 140px;
       min-height: 110px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       text-align: center;
       z-index: 2;
     }
 
-    .user-block { top: 30px; left: 10px; }
-    .friend-block { bottom: 20px; right: 10px; }
+    .user-block { top: 20px; left: 20px; }
+    .friend-block { bottom: 20px; right: 20px; }
 
     .avatar {
       width: 60px;
@@ -171,22 +170,8 @@
       background: #fff;
       padding: 20px;
       border-radius: 16px;
-      max-width: 320px;
+      max-width: 300px;
       text-align: center;
-    }
-
-    .level-circle {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: #229ED9;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      margin: 0 auto 10px;
-      font-weight: bold;
     }
 
     .modal button {
@@ -197,6 +182,30 @@
       border: none;
       border-radius: 10px;
     }
+
+    .level-list {
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    .level-item {
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .level-item.current {
+      font-weight: bold;
+      color: #229ED9;
+    }
+
+    .level-item.locked {
+      color: #aaa;
+    }
+
+    .level-item.reached::after {
+      content: " ✅";
+      color: green;
+    }
   </style>
 </head>
 <body>
@@ -204,29 +213,159 @@
     <div class="ducks">
       <div class="user-block">
         <div class="block-content">
-          <img src="https://i.postimg.cc/XvpxmknG/IMG-1960.jpg" class="avatar" />
-          <h3>Я</h3>
-          <p class="big-number">0 ✈️</p>
+          <img id="myAvatar" class="avatar" />
+          <h3 id="myName"></h3>
+          <p class="big-number" id="myCount">0 ✈️</p>
         </div>
       </div>
       <div class="friend-block">
         <div class="block-content">
-          <img src="https://i.postimg.cc/jjmvbnj8/IMG-1378.jpg" class="avatar" />
-          <h3>Друг</h3>
-          <p class="big-number">0 ✈️</p>
+          <img id="friendAvatar" class="avatar" />
+          <h3 id="friendName">Друг</h3>
+          <p class="big-number" id="friendCount">0 ✈️</p>
         </div>
       </div>
       <img src="myduck.gif" class="user-duck" />
       <img src="friendduck.gif" class="friend-duck" />
     </div>
-    <div class="progress-bar"><div class="progress-fill"></div></div>
-    <div class="progress-text">0 из 1000</div>
-    <button class="btn">Скучаю по тебе ❤️</button>
+
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">0 из 1000</div>
+
+    <button class="btn" id="loveBtn" onclick="sendLove()">Скучаю по тебе ❤️</button>
+
     <div class="buttons-row">
-      <button class="progress-btn">Прогресс</button>
-      <button class="progress-btn">Ваш уровень: 1</button>
+      <button class="progress-btn" onclick="toggleModal('progress')">Прогресс</button>
+      <button class="progress-btn" onclick="toggleModal('level')" id="levelBtn">Ваш уровень: 1</button>
     </div>
-    <div class="history"></div>
+
+    <div class="history" id="history"></div>
   </div>
+
+  <!-- Модалка Прогресс -->
+  <div class="modal" id="progressModal">
+    <div class="modal-content">
+      <h3>Прогресс</h3>
+      <p>Всего самолетиков: <span id="totalClicks">0</span></p>
+      <button onclick="toggleModal('progress')">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Модалка Уровень -->
+  <div class="modal" id="levelModal">
+    <div class="modal-content">
+      <h3>Уровни</h3>
+      <div id="levelsList" class="level-list"></div>
+      <button onclick="toggleModal('level')">Понял</button>
+    </div>
+  </div>
+
+  <script>
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+
+    const tgUser = Telegram.WebApp.initDataUnsafe?.user || {};
+    const myInfo = {
+      id: tgUser.id,
+      name: tgUser.first_name || 'Я',
+      avatar: tgUser.photo_url || 'https://via.placeholder.com/64'
+    };
+
+    let state = {
+      me: { name: myInfo.name, avatar: myInfo.avatar, count: 0 },
+      friend: { name: 'Друг', avatar: '', count: 0 },
+      total: 0
+    };
+
+    const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
+    socket.onopen = () => socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'update') {
+        state = data.payload;
+        updateUI();
+      }
+      if (data.type === 'plane') createPlaneAnimation();
+    };
+
+    function sendLove() {
+      socket.send(JSON.stringify({ type: 'click' }));
+      socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
+      createPlaneAnimation();
+    }
+
+    function updateUI() {
+      document.getElementById('myName').textContent = state.me.name;
+      document.getElementById('myAvatar').src = state.me.avatar;
+      document.getElementById('myCount').textContent = `${state.me.count} ✈️`;
+
+      document.getElementById('friendName').textContent = state.friend.name;
+      document.getElementById('friendAvatar').src = state.friend.avatar;
+      document.getElementById('friendCount').textContent = `${state.friend.count} ✈️`;
+
+      document.getElementById('totalClicks').textContent = state.total;
+
+      const level = Math.floor(state.total / 1000) + 1;
+      const max = Math.min(level * 1000, 10000);
+      const percent = Math.min((state.total / max) * 100, 100);
+      document.getElementById('progressFill').style.width = `${percent}%`;
+      document.getElementById('progressText').textContent = `${state.total} из ${max}`;
+      document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
+
+      // обновление уровней
+      const list = document.getElementById('levelsList');
+      list.innerHTML = "";
+      for (let i = 1; i <= 10; i++) {
+        const item = document.createElement('div');
+        item.className = 'level-item';
+        if (i === level) item.classList.add('current');
+        else if (i < level) item.classList.add('reached');
+        else item.classList.add('locked');
+
+        item.textContent = `Уровень ${i}: ${i * 1000} ✈️`;
+        if (i === level && state.total >= i * 1000) {
+          item.textContent += " — 🎁 Подарок получен";
+        } else if (i === level) {
+          item.textContent += " — текущий";
+        }
+        list.appendChild(item);
+      }
+
+      const entry = `
+        <div class="history-item">
+          <img src="${myInfo.avatar}" />
+          <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
+        </div>`;
+      document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
+    }
+
+    function createPlaneAnimation() {
+      const btn = document.getElementById('loveBtn');
+      const rect = btn.getBoundingClientRect();
+
+      const plane = document.createElement('img');
+      plane.src = 'самолет.gif';
+      plane.className = 'plane';
+
+      const dx = (Math.random() - 0.5) * 400;
+      const dy = -150 - Math.random() * 200;
+      plane.style.setProperty('--x', `${dx}px`);
+      plane.style.setProperty('--y', `${dy}px`);
+      plane.style.left = `${rect.left + rect.width / 2 - 30}px`;
+      plane.style.top = `${rect.top - 20}px`;
+
+      document.body.appendChild(plane);
+      setTimeout(() => plane.remove(), 2000);
+    }
+
+    function toggleModal(type) {
+      const id = type === 'level' ? 'levelModal' : 'progressModal';
+      const modal = document.getElementById(id);
+      modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+      modal.style.justifyContent = 'center';
+      modal.style.alignItems = 'center';
+    }
+  </script>
 </body>
 </html>
