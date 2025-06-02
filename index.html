@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Уточки</title>
   <style>
     :root {
@@ -10,215 +11,184 @@
       --telegram-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    body {
       font-family: var(--telegram-font);
       background: linear-gradient(to bottom, #c2e9fb, #ffffff);
-      overflow-x: hidden;
+      height: 100vh;
+      overflow: hidden;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
     .container {
       max-width: 430px;
       margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       padding: 20px 10px 80px;
-      box-sizing: border-box;
     }
 
     .ducks {
-      position: relative;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 40px;
+      gap: 10px;
     }
 
     .user-block, .friend-block {
-      position: relative;
       background: white;
-      padding: 16px;
       border-radius: 16px;
-      width: 45%;
+      width: 48%;
+      padding: 16px;
+      position: relative;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .user-duck, .friend-duck {
-      position: absolute;
-      width: 90px;
-      z-index: 0;
-    }
-
-    .user-duck {
-      bottom: 90%;
-      left: 0;
-    }
-
-    .friend-duck {
-      bottom: 90%;
-      right: 0;
+    .duck-inside {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
     }
 
     .block-content {
-      position: relative;
-      z-index: 1;
       text-align: center;
-    }
-
-    .block-content img.avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      margin-bottom: 4px;
+      margin-top: 8px;
     }
 
     .block-content h3 {
-      margin: 0;
       font-size: 16px;
+      margin-bottom: 4px;
     }
 
     .block-content p {
-      margin: 2px 0;
       font-size: 14px;
+      margin: 0;
     }
 
     .big-number {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: bold;
       color: var(--telegram-blue);
     }
 
     .btn {
       width: 100%;
-      padding: 14px;
+      padding: 16px;
       font-size: 18px;
       font-weight: bold;
       background-color: var(--telegram-blue);
       color: white;
       border: none;
       border-radius: 16px;
-      margin: 20px 0;
+      margin-top: 20px;
     }
 
     .counter {
       text-align: center;
       font-size: 16px;
-      margin-bottom: 10px;
+      margin-top: 10px;
     }
 
     .history {
       background: white;
       border-radius: 16px;
       padding: 16px;
+      margin-top: 20px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
     .history h4 {
-      margin: 0 0 10px;
+      margin-bottom: 10px;
       font-size: 18px;
     }
 
     .history-item {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .history-item .left {
-      display: flex;
-      align-items: center;
-    }
-
-    .history-item .left img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      margin-right: 8px;
+      margin-bottom: 6px;
     }
 
     .plane {
       position: fixed;
-      width: 80px;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: none;
-      z-index: 100;
+      width: 70px;
+      z-index: 9999;
+      animation: fly 2s linear forwards;
+    }
+
+    @keyframes fly {
+      from {
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+      to {
+        bottom: 100%;
+        transform: translateX(-50%) translateY(-100px);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="ducks">
+      <div class="user-block">
+        <img src="myduck.gif" class="duck-inside" alt="Я" />
+        <div class="block-content">
+          <h3>Я</h3>
+          <p>от меня:</p>
+          <p class="big-number">791</p>
+        </div>
+      </div>
 
-<div class="container">
-  <div class="ducks">
-    <div class="user-block">
-      <img src="myduck.gif" class="user-duck" alt="Уточка Я">
-      <div class="block-content">
-        <img src="https://i.pravatar.cc/36?u=me" class="avatar" alt="Вы" />
-        <h3>Вы</h3>
-        <p>от вас:</p>
-        <p class="big-number">791</p>
+      <div class="friend-block">
+        <img src="friendduck.gif" class="duck-inside" alt="Друг" />
+        <div class="block-content">
+          <h3>Друг</h3>
+          <p>от друга:</p>
+          <p class="big-number">561</p>
+        </div>
       </div>
     </div>
 
-    <div class="friend-block">
-      <img src="friendduck.gif" class="friend-duck" alt="Уточка Мой ❤️">
-      <div class="block-content">
-        <img src="https://i.pravatar.cc/36?u=friend" class="avatar" alt="Мой ❤️" />
-        <h3>Мой ❤️</h3>
-        <p>от Мой:</p>
-        <p class="big-number">561</p>
-      </div>
-    </div>
-  </div>
+    <button class="btn" onclick="sendLove()">Скучаю по тебе ❤️</button>
+    <div class="counter">Нажали <span id="clickCount">77</span> раз</div>
 
-  <button class="btn" onclick="sendLove()">Скучаю по тебе ❤️</button>
-  <div class="counter">Нажали <span id="clickCount">77</span> раз</div>
-
-  <div class="history">
-    <h4>Сегодня</h4>
-    <div class="history-item">
-      <div class="left">
-        <img src="https://i.pravatar.cc/28?u=me" />
-        <span>Вы</span>
-      </div>
-      <span>11 ✈️</span>
-    </div>
-    <div class="history-item">
-      <div class="left">
-        <img src="https://i.pravatar.cc/28?u=me2" />
-        <span>Вы</span>
-      </div>
-      <span>27 ✈️</span>
-    </div>
-    <div class="history-item">
-      <div class="left">
-        <img src="https://i.pravatar.cc/28?u=friend" />
-        <span>Мой ❤️</span>
-      </div>
-      <span>13 ✈️</span>
+    <div class="history">
+      <h4>Сегодня</h4>
+      <div class="history-item"><span>Я</span><span>11 ✈️</span></div>
+      <div class="history-item"><span>Я</span><span>27 ✈️</span></div>
+      <div class="history-item"><span>Друг</span><span>13 ✈️</span></div>
     </div>
   </div>
-</div>
 
-<img src="самолет.gif" class="plane" id="plane" alt="Самолет" />
+  <!-- Самолёт создаётся динамически -->
 
-<script>
-  let count = 77;
+  <script>
+    let count = 77;
 
-  function sendLove() {
-    count++;
-    document.getElementById("clickCount").textContent = count;
+    function sendLove() {
+      count++;
+      document.getElementById('clickCount').textContent = count;
 
-    const plane = document.getElementById("plane");
-    plane.style.display = "block";
-    plane.style.animation = "fly 2s ease-out forwards";
+      const plane = document.createElement('img');
+      plane.src = 'самолет.gif';
+      plane.classList.add('plane');
+      plane.style.left = `${50 + (Math.random() * 20 - 10)}%`; // немного рандомизируем
 
-    setTimeout(() => {
-      plane.style.display = "none";
-      plane.style.animation = "";
-    }, 2000);
-  }
-</script>
+      document.body.appendChild(plane);
 
+      setTimeout(() => {
+        plane.remove();
+      }, 2000);
+    }
+  </script>
 </body>
 </html>
