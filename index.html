@@ -5,6 +5,10 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Уточки</title>
+
+  <!-- Подключение Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
     :root {
       --telegram-blue: #229ED9;
@@ -169,18 +173,13 @@
     </div>
   </div>
 
-  <!-- Самолёт создаётся динамически -->
-
   <script>
-document.addEventListener("DOMContentLoaded", function () {
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.ready();
-       Telegram.WebApp.expand();
-      if (Telegram.WebApp.requestFullscreen) {
-        Telegram.WebApp.requestFullscreen();
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand(); // делает приложение полноэкранным
       }
-    }
-  });
+    });
 
     let count = 77;
 
@@ -191,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const plane = document.createElement('img');
       plane.src = 'самолет.gif';
       plane.classList.add('plane');
-      plane.style.left = `${50 + (Math.random() * 20 - 10)}%`; // немного рандомизируем
+      plane.style.left = `${50 + (Math.random() * 20 - 10)}%`;
 
       document.body.appendChild(plane);
 
