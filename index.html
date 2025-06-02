@@ -36,12 +36,13 @@
     }
 
     .top-section {
-      height: 50%;
+      height: 50vh;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 8px;
+      gap: 10px;
       padding: 10px;
+      background: #c2e9fb;
     }
 
     .block, .duck {
@@ -54,19 +55,11 @@
     .user-block, .friend-block {
       background: white;
       border-radius: 16px;
-      padding: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      width: 100px;
+      font-size: 13px;
       text-align: center;
-    }
-
-    .user-block {
-      align-self: flex-start;
-      justify-self: flex-start;
-    }
-
-    .friend-block {
-      align-self: flex-end;
-      justify-self: flex-end;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .duck img {
@@ -156,21 +149,21 @@
   <div class="top-section">
     <div class="block user-block">
       <div class="block-content">
-        <h3>Вы</h3>
-        <p>от вас:</p>
+        <h3>Я</h3>
+        <p>от меня:</p>
         <p class="big-number" id="myCount">0</p>
       </div>
     </div>
     <div class="duck">
-      <img src="duck_right.gif" alt="Duck1" />
+      <img src="myduck.gif" alt="Моя уточка" />
     </div>
     <div class="duck">
-      <img src="duck_left.gif" alt="Duck2" />
+      <img src="friendduck.gif" alt="Уточка друга" />
     </div>
     <div class="block friend-block">
       <div class="block-content">
-        <h3>Мой❤️</h3>
-        <p>от Мой:</p>
+        <h3>Друг</h3>
+        <p>от друга:</p>
         <p class="big-number" id="friendCount">0</p>
       </div>
     </div>
@@ -247,4 +240,3 @@
   </script>
 </body>
 </html>
-
