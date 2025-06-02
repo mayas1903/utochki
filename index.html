@@ -2,8 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Уточки</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -14,18 +13,15 @@
       overscroll-behavior: none;
       touch-action: none;
     }
-
     :root {
       --telegram-blue: #229ED9;
       --telegram-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-
     body {
       font-family: var(--telegram-font);
       background: linear-gradient(to bottom, #c2e9fb, #ffffff);
@@ -33,7 +29,6 @@
       height: 100vh;
       overflow: hidden;
     }
-
     .container {
       max-width: 430px;
       margin: 0 auto;
@@ -42,12 +37,10 @@
       gap: 20px;
       padding: 10px;
     }
-
     .ducks {
       position: relative;
       height: 50vh;
     }
-
     .user-block,
     .friend-block {
       position: absolute;
@@ -60,17 +53,14 @@
       text-align: center;
       z-index: 2;
     }
-
     .user-block {
       top: 40px;
       left: 20px;
     }
-
     .friend-block {
       bottom: 30px;
       right: 20px;
     }
-
     .avatar {
       width: 64px;
       height: 64px;
@@ -78,7 +68,6 @@
       object-fit: cover;
       margin-bottom: 8px;
     }
-
     .user-duck {
       position: absolute;
       top: 0;
@@ -86,7 +75,6 @@
       height: 220px;
       z-index: 1;
     }
-
     .friend-duck {
       position: absolute;
       bottom: 0;
@@ -94,12 +82,10 @@
       height: 220px;
       z-index: 1;
     }
-
     .block-content h3 {
       font-size: 18px;
       margin-bottom: 6px;
     }
-
     .big-number {
       font-size: 26px;
       font-weight: bold;
@@ -107,17 +93,14 @@
       margin-top: 6px;
       animation: none;
     }
-
     .big-number.pop {
       animation: pop 0.3s ease;
     }
-
     @keyframes pop {
       0% { transform: scale(1); }
       50% { transform: scale(1.3); }
       100% { transform: scale(1); }
     }
-
     .btn {
       width: 100%;
       padding: 14px;
@@ -129,7 +112,6 @@
       border-radius: 14px;
       position: relative;
     }
-
     .progress-btn {
       margin-top: 12px;
       padding: 12px;
@@ -141,7 +123,6 @@
       border-radius: 14px;
       width: 100%;
     }
-
     .progress-bar {
       width: 100%;
       height: 8px;
@@ -149,14 +130,12 @@
       border-radius: 4px;
       overflow: hidden;
     }
-
     .progress-fill {
       height: 100%;
       background: var(--telegram-blue);
       width: 0%;
       transition: width 0.3s ease;
     }
-
     .plane {
       position: absolute;
       width: 60px;
@@ -164,7 +143,6 @@
       pointer-events: none;
       z-index: 1000;
     }
-
     @keyframes fly {
       0% {
         opacity: 1;
@@ -175,7 +153,6 @@
         transform: translate(var(--x), var(--y)) rotate(720deg);
       }
     }
-
     .modal {
       display: none;
       position: fixed;
@@ -185,7 +162,6 @@
       align-items: center;
       z-index: 9999;
     }
-
     .modal-content {
       background: #fff;
       padding: 20px;
@@ -193,11 +169,9 @@
       max-width: 300px;
       text-align: center;
     }
-
     .modal h3 {
       margin-bottom: 10px;
     }
-
     .modal button {
       margin-top: 10px;
       padding: 8px 16px;
@@ -213,15 +187,15 @@
     <div class="ducks">
       <div class="user-block">
         <div class="block-content">
-          <img src="https://i.postimg.cc/XvpxmknG/IMG-1960.jpg" class="avatar" alt="Я">
+          <img id="myAvatar" src="" class="avatar" alt="Я">
           <h3 id="myName">Я</h3>
           <p class="big-number" id="myCount">0 ✈️</p>
         </div>
       </div>
       <div class="friend-block">
         <div class="block-content">
-          <img src="https://i.postimg.cc/jjmvbnj8/IMG-1378.jpg" class="avatar" alt="Друг">
-          <h3>Друг</h3>
+          <img id="friendAvatar" src="" class="avatar" alt="Друг">
+          <h3 id="friendName">Друг</h3>
           <p class="big-number" id="friendCount">0 ✈️</p>
         </div>
       </div>
@@ -249,13 +223,24 @@
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
 
-    let state = { fromMe: 0, fromFriend: 0, total: 0 };
+    const tgUser = Telegram.WebApp.initDataUnsafe?.user || {};
+    const myInfo = {
+      id: tgUser.id,
+      name: tgUser.first_name || 'Я',
+      avatar: tgUser.photo_url || 'https://via.placeholder.com/64'
+    };
+
+    let state = { me: { name: myInfo.name, avatar: myInfo.avatar, count: 0 }, friend: { name: 'Друг', avatar: 'https://via.placeholder.com/64', count: 0 }, total: 0 };
 
     const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
 
+    socket.onopen = () => {
+      socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
+    };
+
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'update' || data.type === 'init') {
+      if (data.type === 'update') {
         state = data.payload;
         updateUI();
       }
@@ -263,12 +248,6 @@
         createPlaneAnimation();
       }
     };
-
-    if (!localStorage.getItem('myName')) {
-      const name = prompt("Как тебя зовут?");
-      if (name) localStorage.setItem('myName', name);
-    }
-    document.getElementById("myName").textContent = localStorage.getItem("myName") || "Я";
 
     function sendLove() {
       socket.send(JSON.stringify({ type: 'click' }));
@@ -278,18 +257,20 @@
     }
 
     function updateUI() {
-      const myCountEl = document.getElementById('myCount');
-      const friendCountEl = document.getElementById('friendCount');
-      const totalEl = document.getElementById('totalClicks');
-      const progressFill = document.getElementById('progressFill');
+      document.getElementById('myName').textContent = state.me.name;
+      document.getElementById('myAvatar').src = state.me.avatar;
+      document.getElementById('myCount').textContent = state.me.count + ' ✈️';
 
-      myCountEl.textContent = state.fromMe + ' ✈️';
-      friendCountEl.textContent = state.fromFriend + ' ✈️';
-      totalEl.textContent = state.total;
+      document.getElementById('friendName').textContent = state.friend.name;
+      document.getElementById('friendAvatar').src = state.friend.avatar;
+      document.getElementById('friendCount').textContent = state.friend.count + ' ✈️';
+
+      document.getElementById('totalClicks').textContent = state.total;
 
       const percent = Math.min((state.total / 1000) * 100, 100);
-      progressFill.style.width = percent + '%';
+      document.getElementById('progressFill').style.width = percent + '%';
 
+      const myCountEl = document.getElementById('myCount');
       myCountEl.classList.add('pop');
       setTimeout(() => myCountEl.classList.remove('pop'), 300);
 
