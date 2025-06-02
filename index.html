@@ -393,7 +393,7 @@ socket.onmessage = (event) => {
   document.getElementById('prizeText').innerHTML = `<strong>${data.payload.reward}</strong>`;
   toggleModal('waiting'); // Закрываем ⏳
   toggleModal('prize');   // Показываем приз
-}
+};
 
 function sendLove() {
   socket.send(JSON.stringify({ type: 'click' }));
