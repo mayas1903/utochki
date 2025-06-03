@@ -277,6 +277,19 @@
   border-left-color: #ccc;
   color: #aaa;
 }
+
+    .danger-btn {
+  background-color: #fff0f0;
+  color: #d62828;
+  border: 2px solid #d62828;
+  transition: 0.2s ease;
+}
+
+.danger-btn:hover {
+  background-color: #d62828;
+  color: white;
+}
+
   </style>
 </head>
 <body>
@@ -312,6 +325,8 @@
 
     <div class="history" id="history"></div>
   </div>
+  
+<button class="progress-btn danger-btn" onclick="resetProgress()">Обнулить ✂️</button>
 
   <!-- Модалка Прогресс -->
   <div class="modal" id="progressModal">
@@ -531,6 +546,17 @@ function toggleModal(type) {
   modal.style.justifyContent = 'center';
   modal.style.alignItems = 'center';
 }
+  
+function resetProgress() {
+  if (confirm("Вы точно хотите обнулить прогресс?")) {
+    state.me.count = 0;
+    state.friend.count = 0;
+    state.total = 0;
+    lastRewardLevel = 0;
+    updateUI();
+  }
+}
+
 </script>
 
 </body>
