@@ -278,14 +278,24 @@
   color: #aaa;
 }
 
-    .danger-btn {
+.circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #d62828;
   background-color: #fff0f0;
   color: #d62828;
-  border: 2px solid #d62828;
-  transition: 0.2s ease;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
-.danger-btn:hover {
+.circle-btn:hover {
   background-color: #d62828;
   color: white;
 }
@@ -318,15 +328,14 @@
 
     <button class="btn" id="loveBtn" onclick="sendLove()">Скучаю по тебе ❤️</button>
 
-    <div class="buttons-row">
-      <button class="progress-btn" onclick="toggleModal('progress')">Прогресс</button>
-      <button class="progress-btn" onclick="toggleModal('level')" id="levelBtn">Ваш уровень: 1</button>
-    </div>
+   <div class="buttons-row">
+  <button class="progress-btn" onclick="toggleModal('progress')">Прогресс</button>
+  <button class="progress-btn" onclick="toggleModal('level')" id="levelBtn">Ваш уровень: 1</button>
+  <button class="circle-btn danger-btn" onclick="resetProgress()" title="Обнулить прогресс">✂️</button>
+</div>
 
     <div class="history" id="history"></div>
   </div>
-  
-<button class="progress-btn danger-btn" onclick="resetProgress()">Обнулить ✂️</button>
 
   <!-- Модалка Прогресс -->
   <div class="modal" id="progressModal">
