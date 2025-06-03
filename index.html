@@ -381,6 +381,13 @@
 </div>
   
 <script>
+  const rewardPool = [
+  "Telegram Premium на 1 месяц",
+   "Telegram Premium на 3 месяца",
+  "Звезды 300 штук",
+  "Звезды 500 штук",
+];
+
 Telegram.WebApp.ready();
 Telegram.WebApp.expand();
 
@@ -484,11 +491,15 @@ function updateUI() {
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
 
-  if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
-    lastRewardLevel += 1000;
-    document.getElementById('rewardLevel').textContent = lastRewardLevel;
-    toggleModal('reward');
-  }
+ if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
+  lastRewardLevel += 1000;
+
+  const randomPrize = rewardPool[Math.floor(Math.random() * rewardPool.length)];
+  rewardMap[lastRewardLevel] = randomPrize;
+
+  document.getElementById('rewardLevel').textContent = lastRewardLevel;
+  document.getElementById('prizeText').innerHTML = `<strong>${randomPrize}</strong>`;
+  toggleModal('reward');
 }
 
 function renderHistory(historyList) {
@@ -557,12 +568,8 @@ function toggleModal(type) {
 }
   
 function resetProgress() {
-  if (confirm("Вы точно хотите обнулить прогресс?")) {
-    state.me.count = 0;
-    state.friend.count = 0;
-    state.total = 0;
-    lastRewardLevel = 0;
-    updateUI();
+  if (confirm("Вы точно хотите обнулить прогресс? Это действие нельзя отменить.")) {
+    socket.send(JSON.stringify({ type: 'resetProgress' }));
   }
 }
 
