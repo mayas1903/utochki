@@ -381,11 +381,11 @@
 </div>
   
 <script>
-  const rewardPool = [
+ const rewardPool = [
   "Telegram Premium на 1 месяц",
-   "Telegram Premium на 3 месяца",
+  "Telegram Premium на 3 месяца",
   "Звезды 300 штук",
-  "Звезды 500 штук",
+  "Звезды 500 штук"
 ];
 
 Telegram.WebApp.ready();
@@ -424,15 +424,19 @@ socket.onmessage = (event) => {
     createPlaneAnimation();
   }
 
- if (data.type === 'rewardGiven') {
-  prizeReceived = true;
-  rewardMap[data.payload.level] = data.payload.reward;
-  document.getElementById('prizeText').innerHTML = `<strong>${data.payload.reward}</strong>`;
-  toggleModal('waiting'); // Закрываем ⏳
-  toggleModal('prize');   // Показываем приз
+  if (data.type === 'rewardGiven') {
+    prizeReceived = true;
+    rewardMap[data.payload.level] = data.payload.reward;
+    document.getElementById('prizeText').innerHTML = `<strong>${data.payload.reward}</strong>`;
+    toggleModal('waiting'); // Закрываем ⏳
+    toggleModal('prize');   // Показываем приз
+  }
+
+  if (data.type === 'resetDone') {
+    alert("Прогресс успешно обнулён!");
   }
 };
-  
+
 function sendLove() {
   socket.send(JSON.stringify({ type: 'click' }));
   socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
@@ -484,22 +488,20 @@ function updateUI() {
     list.appendChild(item);
   }
 
+  // Показ модалки на 1000, 2000... ✈️
+  if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
+    lastRewardLevel += 1000;
+    document.getElementById('rewardLevel').textContent = lastRewardLevel;
+    toggleModal('reward');
+  }
+
+  // История своего клика
   const entry = `
     <div class="history-item">
       <img src="${myInfo.avatar}" />
       <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
-
- if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
-  lastRewardLevel += 1000;
-
-  const randomPrize = rewardPool[Math.floor(Math.random() * rewardPool.length)];
-  rewardMap[lastRewardLevel] = randomPrize;
-
-  document.getElementById('rewardLevel').textContent = lastRewardLevel;
-  document.getElementById('prizeText').innerHTML = `<strong>${randomPrize}</strong>`;
-  toggleModal('reward');
 }
 
 function renderHistory(historyList) {
@@ -545,7 +547,8 @@ function claimReward() {
       document.getElementById('prizeText').textContent = 'Telegram Premium на 1 месяц';
       toggleModal('prize');
     }
-  }, 2000); // Часы строго 2 секунды
+  }, 2000);
+
   socket.send(JSON.stringify({
     type: 'claimReward',
     level: lastRewardLevel
@@ -566,7 +569,7 @@ function toggleModal(type) {
   modal.style.justifyContent = 'center';
   modal.style.alignItems = 'center';
 }
-  
+
 function resetProgress() {
   if (confirm("Вы точно хотите обнулить прогресс? Это действие нельзя отменить.")) {
     socket.send(JSON.stringify({ type: 'resetProgress' }));
