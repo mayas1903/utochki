@@ -460,7 +460,7 @@ function updateUI() {
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
 
-  if (state.total >= lastRewardLevel + 10 && state.total <= 10000) {
+  if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
     lastRewardLevel += 1000;
     document.getElementById('rewardLevel').textContent = lastRewardLevel;
     toggleModal('reward');
