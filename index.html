@@ -467,7 +467,7 @@ function sendLove(times = 1) {
   for (let i = 0; i < times; i++) {
     socket.send(JSON.stringify({ type: 'click' }));
   }
-  socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
+  socket.send(JSON.stringify({ type: 'plane', from: myInfo.id }));
   createDuckAnimation();
 }
 
@@ -489,9 +489,9 @@ function updateUI() {
   document.getElementById('progressText').textContent = `${state.total} из ${max}`;
   document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
 
-  // 🎁 Модалка при каждой 1000 🐥
+  // 🎁 Показать модалку при достижении каждой 1000 🐥
   if (state.total > 0 && state.total % 1000 === 0 && !prizeReceived) {
-    const currentLevel = state.total / 1000;
+    const currentLevel = Math.floor(state.total / 1000);
     const reward = fixedRewards[currentLevel];
     if (reward) {
       rewardMap[currentLevel] = reward;
@@ -530,21 +530,21 @@ function updateUI() {
     else if (i < level) item.classList.add('reached');
     else item.classList.add('locked');
 
-   const icon = document.createElement('div');
-icon.innerHTML = `<strong>${i}к 🐥</strong>`;
-icon.style.maxWidth = '60px';               // ⬅️ ограничиваем ширину
-icon.style.padding = '4px';                 // ⬅️ меньше отступов
-icon.style.borderRadius = '10px';           // ⬅️ мягкие края
-icon.style.display = 'flex';
-icon.style.alignItems = 'center';
-icon.style.justifyContent = 'center';
-icon.style.fontWeight = 'bold';
-icon.style.fontSize = '12px';               // ⬅️ компактнее шрифт
-icon.style.textAlign = 'center';
-icon.style.border = '2px solid #229ED9';
-icon.style.marginRight = '10px';
-icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
-icon.style.flexShrink = '0';
+    const icon = document.createElement('div');
+    icon.innerHTML = `<strong>${i}к 🐥</strong>`;
+    icon.style.maxWidth = '60px';
+    icon.style.padding = '4px 6px';
+    icon.style.borderRadius = '10px';
+    icon.style.display = 'flex';
+    icon.style.alignItems = 'center';
+    icon.style.justifyContent = 'center';
+    icon.style.fontWeight = 'bold';
+    icon.style.fontSize = '12px';
+    icon.style.textAlign = 'center';
+    icon.style.border = '2px solid #229ED9';
+    icon.style.marginRight = '10px';
+    icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
+    icon.style.flexShrink = '0';
 
     const text = document.createElement('div');
     const rewardText = shortRewards[i] || "🎁 Подарок";
@@ -607,13 +607,13 @@ function claimReward() {
   toggleModal('reward');
   toggleModal('waiting');
 
-  const level = state.total / 1000;
-  const fallbackReward = fixedRewards[level]; // ⬅️ берем из списка
+  const level = Math.floor(state.total / 1000);
+  const fallbackReward = fixedRewards[level];
 
   setTimeout(() => {
     toggleModal('waiting');
     if (!prizeReceived) {
-      document.getElementById('prizeText').textContent = fallbackReward || '🎁 Подарок';
+      document.getElementById('prizeText').innerHTML = `<strong>${fallbackReward || '🎁 Подарок'}</strong>`;
       toggleModal('prize');
     }
   }, 2000);
@@ -645,7 +645,7 @@ function resetProgress() {
   }
 }
 
-// 👆 Мультитач
+// 👇 Мультитач на 3 пальца
 const loveBtn = document.getElementById('loveBtn');
 loveBtn.addEventListener('touchstart', (e) => {
   e.preventDefault();
@@ -656,6 +656,7 @@ loveBtn.addEventListener('touchstart', (e) => {
   }
 });
 </script>
+
 
 </body>
 </html>
