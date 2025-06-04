@@ -381,13 +381,6 @@
 </div>
   
 <script>
- const rewardPool = [
-  "Telegram Premium на 1 месяц",
-  "Telegram Premium на 3 месяца",
-  "Звезды 300 штук",
-  "Звезды 500 штук"
-];
-
 Telegram.WebApp.ready();
 Telegram.WebApp.expand();
 
@@ -402,6 +395,19 @@ let state = {
   me: { name: myInfo.name, avatar: myInfo.avatar, count: 0 },
   friend: { name: 'Друг', avatar: '', count: 0 },
   total: 0
+};
+
+const fixedRewards = {
+  1: "🎁 Telegram Premium на 1 месяц",
+  2: "💎 Редкий подарок",
+  3: "🌟 150 звёзд",
+  4: "🎁 Подарок-сюрприз",
+  5: "🌟 200 звёзд",
+  6: "🎁 Telegram Premium на 3 месяца",
+  7: "🎁 Подарок-сюрприз",
+  8: "🌟 300 звёзд",
+  9: "💎 Редкий подарок",
+  10: "🎁 Telegram Premium на 6 месяцев"
 };
 
 const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
@@ -424,19 +430,15 @@ socket.onmessage = (event) => {
     createPlaneAnimation();
   }
 
-  if (data.type === 'rewardGiven') {
-    prizeReceived = true;
-    rewardMap[data.payload.level] = data.payload.reward;
-    document.getElementById('prizeText').innerHTML = `<strong>${data.payload.reward}</strong>`;
-    toggleModal('waiting'); // Закрываем ⏳
-    toggleModal('prize');   // Показываем приз
-  }
-
-  if (data.type === 'resetDone') {
-    alert("Прогресс успешно обнулён!");
+ if (data.type === 'rewardGiven') {
+  prizeReceived = true;
+  rewardMap[data.payload.level] = data.payload.reward;
+  document.getElementById('prizeText').innerHTML = `<strong>${data.payload.reward}</strong>`;
+  toggleModal('waiting'); // Закрываем ⏳
+  toggleModal('prize');   // Показываем приз
   }
 };
-
+  
 function sendLove() {
   socket.send(JSON.stringify({ type: 'click' }));
   socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
@@ -488,20 +490,25 @@ function updateUI() {
     list.appendChild(item);
   }
 
-  // Показ модалки на 1000, 2000... ✈️
-  if (state.total >= lastRewardLevel + 1000 && state.total <= 10000) {
-    lastRewardLevel += 1000;
-    document.getElementById('rewardLevel').textContent = lastRewardLevel;
-    toggleModal('reward');
-  }
-
-  // История своего клика
   const entry = `
     <div class="history-item">
       <img src="${myInfo.avatar}" />
       <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
+
+const currentLevel = Math.floor(state.total / 10);
+
+if (currentLevel > lastRewardLevel && currentLevel <= 10) {
+  lastRewardLevel = currentLevel;
+
+  const fixedReward = fixedRewards[currentLevel];
+  if (fixedReward) {
+    rewardMap[currentLevel] = fixedReward;
+    document.getElementById('rewardLevel').textContent = currentLevel * 1000;
+    document.getElementById('prizeText').innerHTML = `<strong>${fixedReward}</strong>`;
+    toggleModal('reward');
+  }
 }
 
 function renderHistory(historyList) {
@@ -547,8 +554,7 @@ function claimReward() {
       document.getElementById('prizeText').textContent = 'Telegram Premium на 1 месяц';
       toggleModal('prize');
     }
-  }, 2000);
-
+  }, 2000); // Часы строго 2 секунды
   socket.send(JSON.stringify({
     type: 'claimReward',
     level: lastRewardLevel
@@ -569,7 +575,7 @@ function toggleModal(type) {
   modal.style.justifyContent = 'center';
   modal.style.alignItems = 'center';
 }
-
+  
 function resetProgress() {
   if (confirm("Вы точно хотите обнулить прогресс? Это действие нельзя отменить.")) {
     socket.send(JSON.stringify({ type: 'resetProgress' }));
