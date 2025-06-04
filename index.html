@@ -468,8 +468,8 @@ function updateUI() {
 
   document.getElementById('totalClicks').textContent = state.total;
 
-  const level = Math.floor(state.total / 10) + 1;
-  const max = Math.min(level * 10, 100);
+  const level = Math.floor(state.total / 1000) + 1;
+  const max = Math.min(level * 1000, 10000);
   const percent = Math.min((state.total / max) * 100, 100);
   document.getElementById('progressFill').style.width = `${percent}%`;
   document.getElementById('progressText').textContent = `${state.total} из ${max}`;
@@ -503,7 +503,14 @@ function updateUI() {
     const text = document.createElement('div');
     const ducks = `${i}к 🐥`;
     const reward = rewardMap[i] || fixedRewards[i];
-    text.innerHTML = `<strong>${ducks}</strong> — ${reward}`;
+
+    // Сокращаем отображение Telegram Premium только в модалке
+    let displayReward = reward;
+    if (reward.includes("Telegram Premium")) {
+      displayReward = "Tg Premium";
+    }
+
+    text.innerHTML = `<strong>${ducks}</strong> — ${displayReward}`;
     text.style.whiteSpace = 'nowrap';
 
     item.style.alignItems = 'center';
@@ -522,13 +529,13 @@ function updateUI() {
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
 
-  const currentLevel = Math.floor(state.total / 10);
+  const currentLevel = Math.floor(state.total / 1000);
   if (currentLevel === lastRewardLevel + 1 && currentLevel <= 10) {
     lastRewardLevel = currentLevel;
     const reward = fixedRewards[currentLevel];
     if (reward) {
       rewardMap[currentLevel] = reward;
-      document.getElementById('rewardLevel').textContent = currentLevel * 10;
+      document.getElementById('rewardLevel').textContent = currentLevel * 1000;
       document.getElementById('prizeText').innerHTML = `<strong>${reward}</strong>`;
       toggleModal('reward');
     }
@@ -609,7 +616,7 @@ function resetProgress() {
   }
 }
 
-// 👇 Добавим поддержку мультитача
+// 👇 Мультитач на 3 пальца
 const loveBtn = document.getElementById('loveBtn');
 loveBtn.addEventListener('touchstart', (e) => {
   e.preventDefault();
