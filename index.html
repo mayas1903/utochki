@@ -432,28 +432,20 @@ let state = {
 };
 
 const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
-
-// При подключении — авторизация
-socket.onopen = () => {
-  socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
-};
+socket.onopen = () => socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
 
 const rewardMap = {};
-let lastRewardLevel = 0;
 let prizeReceived = false;
 
-// Обработка входящих сообщений
 socket.onmessage = (event) => {
   const data = JSON.parse(event.data);
 
-  // Обновление общего состояния
   if (data.type === 'update') {
     state = data.payload;
     updateUI();
     if (data.payload.history) renderHistory(data.payload.history);
   }
 
-  // Получение подарка
   if (data.type === 'rewardGiven') {
     prizeReceived = true;
     rewardMap[data.payload.level] = data.payload.reward;
@@ -462,27 +454,16 @@ socket.onmessage = (event) => {
     toggleModal('prize');
   }
 
-  // Уточка от друга — синхронизированная анимация
-  if (data.type === 'plane' && data.from !== myInfo.id) {
-    createDuckAnimation();
-  }
-
-  // Подтверждение сброса
   if (data.type === 'resetDone') {
     alert("Прогресс успешно обнулён!");
   }
 };
 
-// Отправка нажатия
 function sendLove(times = 1) {
   for (let i = 0; i < times; i++) {
     socket.send(JSON.stringify({ type: 'click' }));
   }
-
-  // Уточка видна всем (включая себя)
-  socket.send(JSON.stringify({ type: 'plane', from: myInfo.id }));
-
-  // Локальная анимация — ровно одна
+  socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
   createDuckAnimation();
 }
 
@@ -504,61 +485,80 @@ function updateUI() {
   document.getElementById('progressText').textContent = `${state.total} из ${max}`;
   document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
 
+  // 🎁 Модалка при каждой 1000 🐥
+  if (state.total > 0 && state.total % 1000 === 0 && !prizeReceived) {
+    const currentLevel = state.total / 1000;
+    const reward = fixedRewards[currentLevel];
+    if (reward) {
+      rewardMap[currentLevel] = reward;
+      document.getElementById('rewardLevel').textContent = state.total;
+      document.getElementById('prizeText').innerHTML = `<strong>${reward}</strong>`;
+      toggleModal('reward');
+      prizeReceived = true;
+    }
+  }
+
+  if (state.total % 1000 !== 0) {
+    prizeReceived = false;
+  }
+
+  // УРОВНИ
   const list = document.getElementById('levelList');
   list.innerHTML = "";
 
- const shortRewards = {
-  1: "🔥 Tg Premium на 1 месяц",
-  2: "💎 Редкий подарок",
-  3: "🌟 150 звёзд",
-  4: "🎁 Подарок-сюрприз",
-  5: "🌟 200 звёзд",
-  6: "🔥 Tg на 3 месяца",
-  7: "🎁 Подарок-сюрприз",
-  8: "🌟 300 звёзд",
-  9: "💎 Редкий подарок",
-  10: "🔥 Tg Premium на 6 месяцев"
-};
+  const shortRewards = {
+    1: "🔥 Tg Premium на 1 месяц",
+    2: "💎 Редкий подарок",
+    3: "🌟 150 звёзд",
+    4: "🎁 Подарок-сюрприз",
+    5: "🌟 200 звёзд",
+    6: "🔥 Tg на 3 месяца",
+    7: "🎁 Подарок-сюрприз",
+    8: "🌟 300 звёзд",
+    9: "💎 Редкий подарок",
+    10: "🔥 Tg Premium на 6 месяцев"
+  };
 
-for (let i = 1; i <= 10; i++) {
-  const item = document.createElement('div');
-  item.className = 'level-item';
+  for (let i = 1; i <= 10; i++) {
+    const item = document.createElement('div');
+    item.className = 'level-item';
 
-  if (i === level) item.classList.add('current');
-  else if (i < level) item.classList.add('reached');
-  else item.classList.add('locked');
+    if (i === level) item.classList.add('current');
+    else if (i < level) item.classList.add('reached');
+    else item.classList.add('locked');
 
-  // Кружок с уровнем: "1к 🐥"
-const icon = document.createElement('div');
-icon.innerHTML = `<strong>${i}к 🐥</strong>`;
-icon.style.width = '72px';
-icon.style.height = '36px';
-icon.style.borderRadius = '10px'; // 👈 скруглённый квадрат
-icon.style.display = 'flex';
-icon.style.alignItems = 'center';
-icon.style.justifyContent = 'center';
-icon.style.fontWeight = 'bold';
-icon.style.fontSize = '13px';
-icon.style.textAlign = 'center';
-icon.style.border = '2px solid #229ED9';
-icon.style.marginRight = '12px';
-icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
-icon.style.flexShrink = '0';
+    const icon = document.createElement('div');
+    icon.innerHTML = `<strong>${i}к<br>🐥</strong>`;
+    icon.style.minWidth = '48px';
+    icon.style.minHeight = '48px';
+    icon.style.padding = '4px 6px';
+    icon.style.borderRadius = '12px';
+    icon.style.display = 'flex';
+    icon.style.flexDirection = 'column';
+    icon.style.alignItems = 'center';
+    icon.style.justifyContent = 'center';
+    icon.style.fontWeight = 'bold';
+    icon.style.fontSize = '13px';
+    icon.style.textAlign = 'center';
+    icon.style.border = '2px solid #229ED9';
+    icon.style.marginRight = '12px';
+    icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
+    icon.style.lineHeight = '1.2';
+    icon.style.flexShrink = '0';
 
-  // Текст "Приз: ..."
-  const text = document.createElement('div');
-  const rewardText = shortRewards[i] || "🎁 Подарок";
-  text.innerHTML = `<div style="font-size:14px; color:#555;">Приз:</div><div><strong>${rewardText}</strong></div>`;
-  text.style.whiteSpace = 'normal';
+    const text = document.createElement('div');
+    const rewardText = shortRewards[i] || "🎁 Подарок";
+    text.innerHTML = `<div style="font-size:14px; color:#555;">Приз:</div><div><strong>${rewardText}</strong></div>`;
+    text.style.whiteSpace = 'normal';
 
-  item.style.alignItems = 'center';
-  item.style.display = 'flex';
-  item.style.gap = '12px';
+    item.style.alignItems = 'center';
+    item.style.display = 'flex';
+    item.style.gap = '12px';
 
-  item.appendChild(icon);
-  item.appendChild(text);
-  list.appendChild(item);
-}
+    item.appendChild(icon);
+    item.appendChild(text);
+    list.appendChild(item);
+  }
 
   const entry = `
     <div class="history-item">
@@ -566,18 +566,6 @@ icon.style.flexShrink = '0';
       <div><strong>${myInfo.name}</strong><br><span>+1 🐥</span></div>
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
-
-  const currentLevel = Math.floor(state.total / 1000);
-  if (currentLevel === lastRewardLevel + 1 && currentLevel <= 10) {
-    lastRewardLevel = currentLevel;
-    const reward = fixedRewards[currentLevel];
-    if (reward) {
-      rewardMap[currentLevel] = reward;
-      document.getElementById('rewardLevel').textContent = currentLevel * 1000;
-      document.getElementById('prizeText').innerHTML = `<strong>${reward}</strong>`;
-      toggleModal('reward');
-    }
-  }
 }
 
 function renderHistory(historyList) {
@@ -629,7 +617,7 @@ function claimReward() {
 
   socket.send(JSON.stringify({
     type: 'claimReward',
-    level: lastRewardLevel
+    level: state.total / 1000
   }));
 }
 
@@ -654,7 +642,7 @@ function resetProgress() {
   }
 }
 
-// 👇 Мультитач на 3 пальца
+// Мультитач
 const loveBtn = document.getElementById('loveBtn');
 loveBtn.addEventListener('touchstart', (e) => {
   e.preventDefault();
