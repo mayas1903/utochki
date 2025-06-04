@@ -309,6 +309,17 @@
   background-color: #d62828;
   color: white;
 }
+    
+.btn {
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 10px rgba(34, 158, 217, 0.25);
+}
+
+.btn:active {
+  transform: scale(0.95);
+  background-color: #1d8dc0;
+  box-shadow: 0 0 16px 4px rgba(34, 158, 217, 0.3);
+}
 
   </style>
 </head>
@@ -453,9 +464,14 @@ function sendLove(times = 1) {
   for (let i = 0; i < times; i++) {
     socket.send(JSON.stringify({ type: 'click' }));
   }
+
+  // Только один раз отправляем уточку другим пользователям
   socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
+
+  // Отображаем одну анимацию уточки локально
   createDuckAnimation();
 }
+
 
 function updateUI() {
   document.getElementById('myName').textContent = state.me.name;
@@ -500,23 +516,24 @@ for (let i = 1; i <= 10; i++) {
   else item.classList.add('locked');
 
   // Кружок с уровнем: "1к 🐥"
-  const icon = document.createElement('div');
-  icon.innerHTML = `<strong>${i}к 🐥</strong>`;
-  icon.style.width = '64px';
-  icon.style.height = '64px';
-  icon.style.borderRadius = '50%';
-  icon.style.display = 'flex';
-  icon.style.alignItems = 'center';
-  icon.style.justifyContent = 'center';
-  icon.style.fontWeight = 'bold';
-  icon.style.fontSize = '14px';
-  icon.style.textAlign = 'center';
-  icon.style.border = '2px solid #229ED9';
-  icon.style.marginRight = '12px';
-  icon.style.padding = '4px';
-  icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
-  icon.style.lineHeight = '1.2';
-  icon.style.flexShrink = '0';
+const icon = document.createElement('div');
+icon.innerHTML = `<strong>${i}к<br>🐥</strong>`; // 👈 добавляем перенос вручную
+icon.style.width = '48px';
+icon.style.height = '48px';
+icon.style.borderRadius = '50%';
+icon.style.display = 'flex';
+icon.style.flexDirection = 'column'; // 👈 вертикальное размещение
+icon.style.alignItems = 'center';
+icon.style.justifyContent = 'center';
+icon.style.fontWeight = 'bold';
+icon.style.fontSize = '13px';
+icon.style.textAlign = 'center';
+icon.style.border = '2px solid #229ED9';
+icon.style.marginRight = '12px';
+icon.style.padding = '4px';
+icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
+icon.style.lineHeight = '1.1';
+icon.style.flexShrink = '0';
 
   // Текст "Приз: ..."
   const text = document.createElement('div');
