@@ -446,6 +446,10 @@ socket.onmessage = (event) => {
     if (data.payload.history) renderHistory(data.payload.history);
   }
 
+  if (data.type === 'plane' && data.from !== myInfo.id) {
+    createDuckAnimation();
+  }
+
   if (data.type === 'rewardGiven') {
     prizeReceived = true;
     rewardMap[data.payload.level] = data.payload.reward;
@@ -502,7 +506,7 @@ function updateUI() {
     prizeReceived = false;
   }
 
-  // УРОВНИ
+  // Уровни
   const list = document.getElementById('levelList');
   list.innerHTML = "";
 
@@ -522,19 +526,17 @@ function updateUI() {
   for (let i = 1; i <= 10; i++) {
     const item = document.createElement('div');
     item.className = 'level-item';
-
     if (i === level) item.classList.add('current');
     else if (i < level) item.classList.add('reached');
     else item.classList.add('locked');
 
     const icon = document.createElement('div');
-    icon.innerHTML = `<strong>${i}к<br>🐥</strong>`;
-    icon.style.minWidth = '48px';
-    icon.style.minHeight = '48px';
+    icon.innerHTML = `<strong>${i}к 🐥</strong>`;
+    icon.style.minWidth = '64px';
+    icon.style.minHeight = '36px';
     icon.style.padding = '4px 6px';
-    icon.style.borderRadius = '12px';
+    icon.style.borderRadius = '10px';
     icon.style.display = 'flex';
-    icon.style.flexDirection = 'column';
     icon.style.alignItems = 'center';
     icon.style.justifyContent = 'center';
     icon.style.fontWeight = 'bold';
@@ -610,7 +612,8 @@ function claimReward() {
   setTimeout(() => {
     toggleModal('waiting');
     if (!prizeReceived) {
-      document.getElementById('prizeText').textContent = '🎁 Telegram Premium на 1 месяц';
+      const fallback = rewardMap[state.total / 1000] || '🎁 Telegram Premium на 1 месяц';
+      document.getElementById('prizeText').textContent = fallback;
       toggleModal('prize');
     }
   }, 2000);
@@ -642,7 +645,7 @@ function resetProgress() {
   }
 }
 
-// Мультитач
+// 👆 Мультитач
 const loveBtn = document.getElementById('loveBtn');
 loveBtn.addEventListener('touchstart', (e) => {
   e.preventDefault();
