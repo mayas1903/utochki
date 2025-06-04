@@ -530,23 +530,21 @@ function updateUI() {
     else if (i < level) item.classList.add('reached');
     else item.classList.add('locked');
 
-    const icon = document.createElement('div');
-    icon.innerHTML = `<strong>${i}к 🐥</strong>`;
-    icon.style.minWidth = '64px';
-    icon.style.minHeight = '36px';
-    icon.style.padding = '4px 6px';
-    icon.style.borderRadius = '10px';
-    icon.style.display = 'flex';
-    icon.style.alignItems = 'center';
-    icon.style.justifyContent = 'center';
-    icon.style.fontWeight = 'bold';
-    icon.style.fontSize = '13px';
-    icon.style.textAlign = 'center';
-    icon.style.border = '2px solid #229ED9';
-    icon.style.marginRight = '12px';
-    icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
-    icon.style.lineHeight = '1.2';
-    icon.style.flexShrink = '0';
+   const icon = document.createElement('div');
+icon.innerHTML = `<strong>${i}к 🐥</strong>`;
+icon.style.maxWidth = '60px';               // ⬅️ ограничиваем ширину
+icon.style.padding = '4px';                 // ⬅️ меньше отступов
+icon.style.borderRadius = '10px';           // ⬅️ мягкие края
+icon.style.display = 'flex';
+icon.style.alignItems = 'center';
+icon.style.justifyContent = 'center';
+icon.style.fontWeight = 'bold';
+icon.style.fontSize = '12px';               // ⬅️ компактнее шрифт
+icon.style.textAlign = 'center';
+icon.style.border = '2px solid #229ED9';
+icon.style.marginRight = '10px';
+icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
+icon.style.flexShrink = '0';
 
     const text = document.createElement('div');
     const rewardText = shortRewards[i] || "🎁 Подарок";
