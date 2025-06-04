@@ -156,18 +156,25 @@
       border-radius: 50%;
     }
 
-    .plane {
-      position: absolute;
-      width: 60px;
-      animation: fly 2s linear forwards;
-      pointer-events: none;
-      z-index: 1000;
-    }
+.duck-animation {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  animation: fly 1.8s ease-out forwards;
+  pointer-events: none;
+  z-index: 1000;
+}
 
-    @keyframes fly {
-      0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
-      100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(720deg); }
-    }
+@keyframes fly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(180deg); /* ⬅️ было 720deg */
+  }
+}
 
 .modal {
   display: none;
@@ -460,39 +467,45 @@ function updateUI() {
 
   document.getElementById('totalClicks').textContent = state.total;
 
-  const currentLevel = Math.floor(state.total / 1000);
+  const currentLevel = Math.floor(state.total / 10);
   const max = Math.min((currentLevel + 1) * 1000, 10000);
   const percent = Math.min((state.total / max) * 100, 100);
   document.getElementById('progressFill').style.width = `${percent}%`;
   document.getElementById('progressText').textContent = `${state.total} из ${max}`;
   document.getElementById('levelBtn').textContent = `Ваш уровень: ${currentLevel + 1}`;
 
-  const list = document.getElementById('levelList');
-  list.innerHTML = "";
+ for (let i = 1; i <= 10; i++) {
+  const item = document.createElement('div');
+  item.className = 'level-item';
 
-  for (let i = 1; i <= 10; i++) {
-    const item = document.createElement('div');
-    item.className = 'level-item';
+  if (i === level) item.classList.add('current');
+  else if (i < level) item.classList.add('reached');
+  else item.classList.add('locked');
 
-    const base = `Уровень ${i}: ${i * 1000} 🐥`;
-    const prize = rewardMap[i];
+  const icon = document.createElement('div');
+  icon.textContent = i;
+  icon.style.width = '32px';
+  icon.style.height = '32px';
+  icon.style.borderRadius = '50%';
+  icon.style.display = 'flex';
+  icon.style.alignItems = 'center';
+  icon.style.justifyContent = 'center';
+  icon.style.fontWeight = 'bold';
+  icon.style.fontSize = '15px';
+  icon.style.border = '2px solid #229ED9';
+  icon.style.marginRight = '10px';
+  icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
 
-    if (i === currentLevel + 1) item.classList.add('current');
-    else if (i <= currentLevel) item.classList.add('reached');
-    else item.classList.add('locked');
+  const text = document.createElement('div');
+  const ducks = `${i}к 🐥`;
+  const reward = rewardMap[i] || fixedRewards[i];
+  text.innerHTML = `<strong>${ducks}</strong> — ${reward}`;
 
-    if (prize) {
-      item.textContent = `${base} — ${prize}`;
-    } else if (i === currentLevel + 1 && state.total >= i * 1000) {
-      item.textContent = `${base} — 🎁 Подарок получен`;
-    } else if (i === currentLevel + 1) {
-      item.textContent = `${base} — текущий`;
-    } else {
-      item.textContent = base;
-    }
-
-    list.appendChild(item);
-  }
+  item.style.alignItems = 'center';
+  item.appendChild(icon);
+  item.appendChild(text);
+  list.appendChild(item);
+}
 
   const entry = `
     <div class="history-item">
@@ -533,16 +546,20 @@ function createDuckAnimation() {
 
   const duck = document.createElement('img');
   duck.src = 'duck.gif';
-  duck.className = 'plane'; // можно переименовать класс, если хочешь
-  const dx = (Math.random() - 0.5) * 400;
-  const dy = -150 - Math.random() * 200;
+  duck.className = 'duck-animation';
+  duck.style.width = '40px';   // ⬅️ меньше
+  duck.style.height = '40px';
+
+  const dx = (Math.random() - 0.5) * 200;  // ⬅️ меньше разброс
+  const dy = -120 - Math.random() * 100;
+
   duck.style.setProperty('--x', `${dx}px`);
   duck.style.setProperty('--y', `${dy}px`);
-  duck.style.left = `${rect.left + rect.width / 2 - 30}px`;
+  duck.style.left = `${rect.left + rect.width / 2 - 20}px`;
   duck.style.top = `${rect.top - 20}px`;
 
   document.body.appendChild(duck);
-  setTimeout(() => duck.remove(), 2000);
+  setTimeout(() => duck.remove(), 2000); // чуть короче
 }
 
 function claimReward() {
