@@ -257,16 +257,16 @@
     
 .level-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;        /* ⬅️ выравниваем по верхнему краю */
   gap: 12px;
   padding: 10px 14px;
   border-radius: 10px;
   background: #f0f8ff;
   border-left: 5px solid #229ED9;
   font-size: 15px;
-  white-space: nowrap; /* ⬅️ запрещаем перенос */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;            /* ⬅️ разрешаем перенос строк */
+  overflow: visible;
+  text-overflow: initial;
 }
 
 .level-item.reached {
@@ -478,49 +478,60 @@ function updateUI() {
   const list = document.getElementById('levelList');
   list.innerHTML = "";
 
-  for (let i = 1; i <= 10; i++) {
-    const item = document.createElement('div');
-    item.className = 'level-item';
+ const shortRewards = {
+  1: "🔥 Tg Premium на 1 месяц",
+  2: "💎 Редкий подарок",
+  3: "🌟 150 звёзд",
+  4: "🎁 Подарок-сюрприз",
+  5: "🌟 200 звёзд",
+  6: "🔥 Tg на 3 месяца",
+  7: "🎁 Подарок-сюрприз",
+  8: "🌟 300 звёзд",
+  9: "💎 Редкий подарок",
+  10: "🔥 Tg Premium на 6 месяцев"
+};
 
-    if (i === level) item.classList.add('current');
-    else if (i < level) item.classList.add('reached');
-    else item.classList.add('locked');
+for (let i = 1; i <= 10; i++) {
+  const item = document.createElement('div');
+  item.className = 'level-item';
 
-    const icon = document.createElement('div');
-    icon.textContent = i;
-    icon.style.width = '32px';
-    icon.style.height = '32px';
-    icon.style.borderRadius = '50%';
-    icon.style.display = 'flex';
-    icon.style.alignItems = 'center';
-    icon.style.justifyContent = 'center';
-    icon.style.fontWeight = 'bold';
-    icon.style.fontSize = '15px';
-    icon.style.border = '2px solid #229ED9';
-    icon.style.marginRight = '10px';
-    icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
+  if (i === level) item.classList.add('current');
+  else if (i < level) item.classList.add('reached');
+  else item.classList.add('locked');
 
-    const text = document.createElement('div');
-    const ducks = `${i}к 🐥`;
-    const reward = rewardMap[i] || fixedRewards[i];
+  // Кружок с уровнем: "1к 🐥"
+  const icon = document.createElement('div');
+  icon.innerHTML = `<strong>${i}к 🐥</strong>`;
+  icon.style.width = '64px';
+  icon.style.height = '64px';
+  icon.style.borderRadius = '50%';
+  icon.style.display = 'flex';
+  icon.style.alignItems = 'center';
+  icon.style.justifyContent = 'center';
+  icon.style.fontWeight = 'bold';
+  icon.style.fontSize = '14px';
+  icon.style.textAlign = 'center';
+  icon.style.border = '2px solid #229ED9';
+  icon.style.marginRight = '12px';
+  icon.style.padding = '4px';
+  icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
+  icon.style.lineHeight = '1.2';
+  icon.style.flexShrink = '0';
 
-    // Сокращаем отображение Telegram Premium только в модалке
-    let displayReward = reward;
-    if (reward.includes("Telegram Premium")) {
-      displayReward = "Tg Premium";
-    }
+  // Текст "Приз: ..."
+  const text = document.createElement('div');
+  const rewardText = shortRewards[i] || "🎁 Подарок";
+  text.innerHTML = `<div style="font-size:14px; color:#555;">Приз:</div><div><strong>${rewardText}</strong></div>`;
+  text.style.whiteSpace = 'normal';
 
-    text.innerHTML = `<strong>${ducks}</strong> — ${displayReward}`;
-    text.style.whiteSpace = 'nowrap';
+  item.style.alignItems = 'center';
+  item.style.display = 'flex';
+  item.style.gap = '12px';
 
-    item.style.alignItems = 'center';
-    item.style.display = 'flex';
-    item.style.gap = '12px';
-
-    item.appendChild(icon);
-    item.appendChild(text);
-    list.appendChild(item);
-  }
+  item.appendChild(icon);
+  item.appendChild(text);
+  list.appendChild(item);
+}
 
   const entry = `
     <div class="history-item">
