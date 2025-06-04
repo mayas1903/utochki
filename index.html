@@ -432,21 +432,28 @@ let state = {
 };
 
 const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
-socket.onopen = () => socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
+
+// При подключении — авторизация
+socket.onopen = () => {
+  socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
+};
 
 const rewardMap = {};
 let lastRewardLevel = 0;
 let prizeReceived = false;
 
+// Обработка входящих сообщений
 socket.onmessage = (event) => {
   const data = JSON.parse(event.data);
 
+  // Обновление общего состояния
   if (data.type === 'update') {
     state = data.payload;
     updateUI();
     if (data.payload.history) renderHistory(data.payload.history);
   }
 
+  // Получение подарка
   if (data.type === 'rewardGiven') {
     prizeReceived = true;
     rewardMap[data.payload.level] = data.payload.reward;
@@ -455,23 +462,29 @@ socket.onmessage = (event) => {
     toggleModal('prize');
   }
 
+  // Уточка от друга — синхронизированная анимация
+  if (data.type === 'plane' && data.from !== myInfo.id) {
+    createDuckAnimation();
+  }
+
+  // Подтверждение сброса
   if (data.type === 'resetDone') {
     alert("Прогресс успешно обнулён!");
   }
 };
 
+// Отправка нажатия
 function sendLove(times = 1) {
   for (let i = 0; i < times; i++) {
     socket.send(JSON.stringify({ type: 'click' }));
   }
 
-  // Только один раз отправляем уточку другим пользователям
-  socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
+  // Уточка видна всем (включая себя)
+  socket.send(JSON.stringify({ type: 'plane', from: myInfo.id }));
 
-  // Отображаем одну анимацию уточки локально
+  // Локальная анимация — ровно одна
   createDuckAnimation();
 }
-
 
 function updateUI() {
   document.getElementById('myName').textContent = state.me.name;
@@ -517,12 +530,11 @@ for (let i = 1; i <= 10; i++) {
 
   // Кружок с уровнем: "1к 🐥"
 const icon = document.createElement('div');
-icon.innerHTML = `<strong>${i}к<br>🐥</strong>`; // 👈 добавляем перенос вручную
-icon.style.width = '48px';
-icon.style.height = '48px';
-icon.style.borderRadius = '50%';
+icon.innerHTML = `<strong>${i}к 🐥</strong>`;
+icon.style.width = '72px';
+icon.style.height = '36px';
+icon.style.borderRadius = '10px'; // 👈 скруглённый квадрат
 icon.style.display = 'flex';
-icon.style.flexDirection = 'column'; // 👈 вертикальное размещение
 icon.style.alignItems = 'center';
 icon.style.justifyContent = 'center';
 icon.style.fontWeight = 'bold';
@@ -530,9 +542,7 @@ icon.style.fontSize = '13px';
 icon.style.textAlign = 'center';
 icon.style.border = '2px solid #229ED9';
 icon.style.marginRight = '12px';
-icon.style.padding = '4px';
 icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
-icon.style.lineHeight = '1.1';
 icon.style.flexShrink = '0';
 
   // Текст "Приз: ..."
