@@ -607,18 +607,20 @@ function claimReward() {
   toggleModal('reward');
   toggleModal('waiting');
 
+  const level = state.total / 1000;
+  const fallbackReward = fixedRewards[level]; // ⬅️ берем из списка
+
   setTimeout(() => {
     toggleModal('waiting');
     if (!prizeReceived) {
-      const fallback = rewardMap[state.total / 1000] || '🎁 Telegram Premium на 1 месяц';
-      document.getElementById('prizeText').textContent = fallback;
+      document.getElementById('prizeText').textContent = fallbackReward || '🎁 Подарок';
       toggleModal('prize');
     }
   }, 2000);
 
   socket.send(JSON.stringify({
     type: 'claimReward',
-    level: state.total / 1000
+    level
   }));
 }
 
