@@ -303,50 +303,50 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="ducks">
-      <div class="user-block">
-        <div class="block-content">
-          <img id="myAvatar" class="avatar" />
-          <h3 id="myName"></h3>
-          <p class="big-number" id="myCount">0 ✈️</p>
-        </div>
+<div class="container">
+  <div class="ducks">
+    <div class="user-block">
+      <div class="block-content">
+        <img id="myAvatar" class="avatar" />
+        <h3 id="myName"></h3>
+        <p class="big-number" id="myCount">0 🐥</p>
       </div>
-      <div class="friend-block">
-        <div class="block-content">
-          <img id="friendAvatar" class="avatar" />
-          <h3 id="friendName">Друг</h3>
-          <p class="big-number" id="friendCount">0 ✈️</p>
-        </div>
-      </div>
-      <img src="myduck.gif" class="user-duck" />
-      <img src="friendduck.gif" class="friend-duck" />
     </div>
+    <div class="friend-block">
+      <div class="block-content">
+        <img id="friendAvatar" class="avatar" />
+        <h3 id="friendName">Друг</h3>
+        <p class="big-number" id="friendCount">0 🐥</p>
+      </div>
+    </div>
+    <img src="myduck.gif" class="user-duck" />
+    <img src="friendduck.gif" class="friend-duck" />
+  </div>
 
-    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <div class="progress-text" id="progressText">0 из 1000</div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">0 из 1000</div>
 
-    <button class="btn" id="loveBtn" onclick="sendLove()">Скучаю по тебе ❤️</button>
+  <button class="btn" id="loveBtn" onclick="sendLove()">Скучаю по тебе ❤️</button>
 
-   <div class="buttons-row">
-  <button class="progress-btn" onclick="toggleModal('progress')">Прогресс</button>
-  <button class="progress-btn" onclick="toggleModal('level')" id="levelBtn">Ваш уровень: 1</button>
-  <button class="circle-btn danger-btn" onclick="resetProgress()" title="Обнулить прогресс">✂️</button>
+  <div class="buttons-row">
+    <button class="progress-btn" onclick="toggleModal('progress')">Прогресс</button>
+    <button class="progress-btn" onclick="toggleModal('level')" id="levelBtn">Ваш уровень: 1</button>
+    <button class="circle-btn danger-btn" onclick="resetProgress()" title="Обнулить прогресс">✂️</button>
+  </div>
+
+  <div class="history" id="history"></div>
 </div>
 
-    <div class="history" id="history"></div>
+<!-- Модалка Прогресс -->
+<div class="modal" id="progressModal">
+  <div class="modal-content">
+    <h3>Прогресс</h3>
+    <p>Всего уточек: <span id="totalClicks">0</span></p>
+    <button onclick="toggleModal('progress')">Закрыть</button>
   </div>
+</div>
 
-  <!-- Модалка Прогресс -->
-  <div class="modal" id="progressModal">
-    <div class="modal-content">
-      <h3>Прогресс</h3>
-      <p>Всего самолетиков: <span id="totalClicks">0</span></p>
-      <button onclick="toggleModal('progress')">Закрыть</button>
-    </div>
-  </div>
-
-  <!-- Модалка Уровень -->
+<!-- Модалка Уровень -->
 <div class="modal" id="levelModal">
   <div class="modal-content">
     <h3 style="margin-bottom: 12px;">Ваш уровень</h3>
@@ -355,11 +355,11 @@
   </div>
 </div>
 
-  <!-- Модалка Награда -->
+<!-- Модалка Награда -->
 <div class="modal" id="rewardModal">
   <div class="modal-content">
-    <img src="plane.gif" class="modal-img" />
-    <h3>🎉 Ура! Вы накопили <span id="rewardLevel">1000</span> самолетиков!</h3>
+    <img src="duck.gif" class="modal-img" />
+    <h3>🎉 Ура! Вы собрали <span id="rewardLevel">1000</span> уточек!</h3>
     <p>Вам доступен подарок</p>
     <button onclick="claimReward()">Получить 🤩</button>
   </div>
@@ -375,12 +375,26 @@
   <div class="modal-content">
     <img src="priz.gif" class="modal-img" />
     <h3>🎁 Вы получили:</h3>
-<p id="prizeText"><strong>Telegram Premium на 3 месяца</strong></p>
+    <p id="prizeText"><strong>Telegram Premium на 3 месяца</strong></p>
     <button onclick="toggleModal('prize')">АКТИВИРОВАТЬ</button>
   </div>
 </div>
   
 <script>
+<script>
+const fixedRewards = {
+  1: "🎁 Telegram Premium на 1 месяц",
+  2: "💎 Редкий подарок",
+  3: "🌟 150 звёзд",
+  4: "🎁 Подарок-сюрприз",
+  5: "🌟 200 звёзд",
+  6: "🎁 Telegram Premium на 3 месяца",
+  7: "🎁 Подарок-сюрприз",
+  8: "🌟 300 звёзд",
+  9: "💎 Редкий подарок",
+  10: "🎁 Telegram Premium на 6 месяцев"
+};
+
 Telegram.WebApp.ready();
 Telegram.WebApp.expand();
 
@@ -397,23 +411,10 @@ let state = {
   total: 0
 };
 
-const fixedRewards = {
-  1: "🎁 Telegram Premium на 1 месяц",
-  2: "💎 Редкий подарок",
-  3: "🌟 150 звёзд",
-  4: "🎁 Подарок-сюрприз",
-  5: "🌟 200 звёзд",
-  6: "🎁 Telegram Premium на 3 месяца",
-  7: "🎁 Подарок-сюрприз",
-  8: "🌟 300 звёзд",
-  9: "💎 Редкий подарок",
-  10: "🎁 Telegram Premium на 6 месяцев"
-};
-
 const socket = new WebSocket("wss://apple-adhesive-ticket.glitch.me");
 socket.onopen = () => socket.send(JSON.stringify({ type: 'auth', user: myInfo }));
 
-const rewardMap = {}; // уровень → текст награды
+const rewardMap = {};
 let lastRewardLevel = 0;
 let prizeReceived = false;
 
@@ -427,41 +428,45 @@ socket.onmessage = (event) => {
   }
 
   if (data.type === 'plane') {
-    createPlaneAnimation();
+    createDuckAnimation();
   }
 
- if (data.type === 'rewardGiven') {
-  prizeReceived = true;
-  rewardMap[data.payload.level] = data.payload.reward;
-  document.getElementById('prizeText').innerHTML = `<strong>${data.payload.reward}</strong>`;
-  toggleModal('waiting'); // Закрываем ⏳
-  toggleModal('prize');   // Показываем приз
+  if (data.type === 'rewardGiven') {
+    prizeReceived = true;
+    rewardMap[data.payload.level] = data.payload.reward;
+    document.getElementById('prizeText').innerHTML = `<strong>${data.payload.reward}</strong>`;
+    toggleModal('waiting');
+    toggleModal('prize');
+  }
+
+  if (data.type === 'resetDone') {
+    alert("Прогресс успешно обнулён!");
   }
 };
-  
+
 function sendLove() {
   socket.send(JSON.stringify({ type: 'click' }));
   socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
-  createPlaneAnimation();
+  createDuckAnimation();
 }
 
 function updateUI() {
   document.getElementById('myName').textContent = state.me.name;
   document.getElementById('myAvatar').src = state.me.avatar;
-  document.getElementById('myCount').textContent = `${state.me.count} ✈️`;
+  document.getElementById('myCount').textContent = `${state.me.count} 🐥`;
 
   document.getElementById('friendName').textContent = state.friend.name;
   document.getElementById('friendAvatar').src = state.friend.avatar;
-  document.getElementById('friendCount').textContent = `${state.friend.count} ✈️`;
+  document.getElementById('friendCount').textContent = `${state.friend.count} 🐥`;
 
   document.getElementById('totalClicks').textContent = state.total;
 
-  const level = Math.floor(state.total / 1000) + 1;
-  const max = Math.min(level * 1000, 10000);
+  const currentLevel = Math.floor(state.total / 1000);
+  const max = Math.min((currentLevel + 1) * 1000, 10000);
   const percent = Math.min((state.total / max) * 100, 100);
   document.getElementById('progressFill').style.width = `${percent}%`;
   document.getElementById('progressText').textContent = `${state.total} из ${max}`;
-  document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
+  document.getElementById('levelBtn').textContent = `Ваш уровень: ${currentLevel + 1}`;
 
   const list = document.getElementById('levelList');
   list.innerHTML = "";
@@ -470,18 +475,18 @@ function updateUI() {
     const item = document.createElement('div');
     item.className = 'level-item';
 
-    const base = `Уровень ${i}: ${i * 1000} ✈️`;
+    const base = `Уровень ${i}: ${i * 1000} 🐥`;
     const prize = rewardMap[i];
 
-    if (i === level) item.classList.add('current');
-    else if (i < level) item.classList.add('reached');
+    if (i === currentLevel + 1) item.classList.add('current');
+    else if (i <= currentLevel) item.classList.add('reached');
     else item.classList.add('locked');
 
     if (prize) {
-      item.textContent = `${base} — 🎁 ${prize}`;
-    } else if (i === level && state.total >= i * 1000) {
+      item.textContent = `${base} — ${prize}`;
+    } else if (i === currentLevel + 1 && state.total >= i * 1000) {
       item.textContent = `${base} — 🎁 Подарок получен`;
-    } else if (i === level) {
+    } else if (i === currentLevel + 1) {
       item.textContent = `${base} — текущий`;
     } else {
       item.textContent = base;
@@ -493,21 +498,20 @@ function updateUI() {
   const entry = `
     <div class="history-item">
       <img src="${myInfo.avatar}" />
-      <div><strong>${myInfo.name}</strong><br><span>+1 ✈️</span></div>
+      <div><strong>${myInfo.name}</strong><br><span>+1 🐥</span></div>
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
 
-const currentLevel = Math.floor(state.total / 10);
+  if (currentLevel >= lastRewardLevel && currentLevel <= 10) {
+    lastRewardLevel = currentLevel;
 
-if (currentLevel > lastRewardLevel && currentLevel <= 10) {
-  lastRewardLevel = currentLevel;
-
-  const fixedReward = fixedRewards[currentLevel];
-  if (fixedReward) {
-    rewardMap[currentLevel] = fixedReward;
-    document.getElementById('rewardLevel').textContent = currentLevel * 1000;
-    document.getElementById('prizeText').innerHTML = `<strong>${fixedReward}</strong>`;
-    toggleModal('reward');
+    const reward = fixedRewards[currentLevel];
+    if (reward) {
+      rewardMap[currentLevel] = reward;
+      document.getElementById('rewardLevel').textContent = currentLevel * 1000;
+      document.getElementById('prizeText').innerHTML = `<strong>${reward}</strong>`;
+      toggleModal('reward');
+    }
   }
 }
 
@@ -518,43 +522,43 @@ function renderHistory(historyList) {
     const html = `
       <div class="history-item">
         <img src="${entry.avatar}" />
-        <div><strong>${entry.name}</strong><br><span>+${entry.amount} ✈️</span></div>
+        <div><strong>${entry.name}</strong><br><span>+${entry.amount} 🐥</span></div>
       </div>`;
     container.insertAdjacentHTML('beforeend', html);
   }
 }
 
-function createPlaneAnimation() {
+function createDuckAnimation() {
   const btn = document.getElementById('loveBtn');
   const rect = btn.getBoundingClientRect();
 
-  const plane = document.createElement('img');
-  plane.src = 'самолет.gif';
-  plane.className = 'plane';
-
+  const duck = document.createElement('img');
+  duck.src = 'duck.gif';
+  duck.className = 'plane'; // можно переименовать класс, если хочешь
   const dx = (Math.random() - 0.5) * 400;
   const dy = -150 - Math.random() * 200;
-  plane.style.setProperty('--x', `${dx}px`);
-  plane.style.setProperty('--y', `${dy}px`);
-  plane.style.left = `${rect.left + rect.width / 2 - 30}px`;
-  plane.style.top = `${rect.top - 20}px`;
+  duck.style.setProperty('--x', `${dx}px`);
+  duck.style.setProperty('--y', `${dy}px`);
+  duck.style.left = `${rect.left + rect.width / 2 - 30}px`;
+  duck.style.top = `${rect.top - 20}px`;
 
-  document.body.appendChild(plane);
-  setTimeout(() => plane.remove(), 2000);
+  document.body.appendChild(duck);
+  setTimeout(() => duck.remove(), 2000);
 }
 
 function claimReward() {
   prizeReceived = false;
-  toggleModal('reward');   // закрыть окно "Вам доступен приз"
-  toggleModal('waiting');  // показать часы
+  toggleModal('reward');
+  toggleModal('waiting');
 
   setTimeout(() => {
     toggleModal('waiting');
     if (!prizeReceived) {
-      document.getElementById('prizeText').textContent = 'Telegram Premium на 1 месяц';
+      document.getElementById('prizeText').textContent = '🎁 Telegram Premium на 1 месяц';
       toggleModal('prize');
     }
-  }, 2000); // Часы строго 2 секунды
+  }, 2000);
+
   socket.send(JSON.stringify({
     type: 'claimReward',
     level: lastRewardLevel
@@ -575,13 +579,12 @@ function toggleModal(type) {
   modal.style.justifyContent = 'center';
   modal.style.alignItems = 'center';
 }
-  
+
 function resetProgress() {
   if (confirm("Вы точно хотите обнулить прогресс? Это действие нельзя отменить.")) {
     socket.send(JSON.stringify({ type: 'resetProgress' }));
   }
 }
-
 </script>
 
 </body>
