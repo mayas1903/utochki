@@ -191,7 +191,7 @@
   padding: 16px;
   border-radius: 20px;
   width: auto;
-  max-width: 280px;
+  max-width: 380px;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
   text-align: center;
   display: flex;
@@ -256,14 +256,17 @@
 }
     
 .level-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 10px 14px;
   border-radius: 10px;
   background: #f0f8ff;
   border-left: 5px solid #229ED9;
   font-size: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  white-space: nowrap; /* ⬅️ запрещаем перенос */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .level-item.reached {
@@ -365,7 +368,7 @@
 <!-- Модалка Награда -->
 <div class="modal" id="rewardModal">
   <div class="modal-content">
-    <img src="duck.gif" class="modal-img" />
+    <img src="plane.gif" class="modal-img" />
     <h3>🎉 Ура! Вы собрали <span id="rewardLevel">1000</span> уточек!</h3>
     <p>Вам доступен подарок</p>
     <button onclick="claimReward()">Получить 🤩</button>
@@ -433,11 +436,6 @@ socket.onmessage = (event) => {
     if (data.payload.history) renderHistory(data.payload.history);
   }
 
-  // Удаляем дублирующий вызов уточки:
-  // if (data.type === 'plane') {
-  //   createDuckAnimation(); ← больше не нужен
-  // }
-
   if (data.type === 'rewardGiven') {
     prizeReceived = true;
     rewardMap[data.payload.level] = data.payload.reward;
@@ -451,10 +449,12 @@ socket.onmessage = (event) => {
   }
 };
 
-function sendLove() {
-  socket.send(JSON.stringify({ type: 'click' }));
+function sendLove(times = 1) {
+  for (let i = 0; i < times; i++) {
+    socket.send(JSON.stringify({ type: 'click' }));
+  }
   socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
-  createDuckAnimation(); // ← запускается только локально
+  createDuckAnimation();
 }
 
 function updateUI() {
@@ -475,7 +475,6 @@ function updateUI() {
   document.getElementById('progressText').textContent = `${state.total} из ${max}`;
   document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
 
-  // --- Уровни
   const list = document.getElementById('levelList');
   list.innerHTML = "";
 
@@ -505,16 +504,17 @@ function updateUI() {
     const ducks = `${i}к 🐥`;
     const reward = rewardMap[i] || fixedRewards[i];
     text.innerHTML = `<strong>${ducks}</strong> — ${reward}`;
+    text.style.whiteSpace = 'nowrap';
 
     item.style.alignItems = 'center';
     item.style.display = 'flex';
+    item.style.gap = '12px';
 
     item.appendChild(icon);
     item.appendChild(text);
     list.appendChild(item);
   }
 
-  // --- История
   const entry = `
     <div class="history-item">
       <img src="${myInfo.avatar}" />
@@ -608,6 +608,17 @@ function resetProgress() {
     socket.send(JSON.stringify({ type: 'resetProgress' }));
   }
 }
+
+// 👇 Добавим поддержку мультитача
+const loveBtn = document.getElementById('loveBtn');
+loveBtn.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  if (e.touches.length >= 3) {
+    sendLove(150);
+  } else {
+    sendLove();
+  }
+});
 </script>
 
 </body>
