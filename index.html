@@ -433,9 +433,10 @@ socket.onmessage = (event) => {
     if (data.payload.history) renderHistory(data.payload.history);
   }
 
-  if (data.type === 'plane') {
-    createDuckAnimation();
-  }
+  // Удаляем дублирующий вызов уточки:
+  // if (data.type === 'plane') {
+  //   createDuckAnimation(); ← больше не нужен
+  // }
 
   if (data.type === 'rewardGiven') {
     prizeReceived = true;
@@ -453,7 +454,7 @@ socket.onmessage = (event) => {
 function sendLove() {
   socket.send(JSON.stringify({ type: 'click' }));
   socket.send(JSON.stringify({ type: 'plane', from: 'me' }));
-  createDuckAnimation();
+  createDuckAnimation(); // ← запускается только локально
 }
 
 function updateUI() {
@@ -467,46 +468,53 @@ function updateUI() {
 
   document.getElementById('totalClicks').textContent = state.total;
 
-  const currentLevel = Math.floor(state.total / 10);
-  const max = Math.min((currentLevel + 1) * 1000, 10000);
+  const level = Math.floor(state.total / 10) + 1;
+  const max = Math.min(level * 10, 100);
   const percent = Math.min((state.total / max) * 100, 100);
   document.getElementById('progressFill').style.width = `${percent}%`;
   document.getElementById('progressText').textContent = `${state.total} из ${max}`;
-  document.getElementById('levelBtn').textContent = `Ваш уровень: ${currentLevel + 1}`;
+  document.getElementById('levelBtn').textContent = `Ваш уровень: ${level}`;
 
- for (let i = 1; i <= 10; i++) {
-  const item = document.createElement('div');
-  item.className = 'level-item';
+  // --- Уровни
+  const list = document.getElementById('levelList');
+  list.innerHTML = "";
 
-  if (i === level) item.classList.add('current');
-  else if (i < level) item.classList.add('reached');
-  else item.classList.add('locked');
+  for (let i = 1; i <= 10; i++) {
+    const item = document.createElement('div');
+    item.className = 'level-item';
 
-  const icon = document.createElement('div');
-  icon.textContent = i;
-  icon.style.width = '32px';
-  icon.style.height = '32px';
-  icon.style.borderRadius = '50%';
-  icon.style.display = 'flex';
-  icon.style.alignItems = 'center';
-  icon.style.justifyContent = 'center';
-  icon.style.fontWeight = 'bold';
-  icon.style.fontSize = '15px';
-  icon.style.border = '2px solid #229ED9';
-  icon.style.marginRight = '10px';
-  icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
+    if (i === level) item.classList.add('current');
+    else if (i < level) item.classList.add('reached');
+    else item.classList.add('locked');
 
-  const text = document.createElement('div');
-  const ducks = `${i}к 🐥`;
-  const reward = rewardMap[i] || fixedRewards[i];
-  text.innerHTML = `<strong>${ducks}</strong> — ${reward}`;
+    const icon = document.createElement('div');
+    icon.textContent = i;
+    icon.style.width = '32px';
+    icon.style.height = '32px';
+    icon.style.borderRadius = '50%';
+    icon.style.display = 'flex';
+    icon.style.alignItems = 'center';
+    icon.style.justifyContent = 'center';
+    icon.style.fontWeight = 'bold';
+    icon.style.fontSize = '15px';
+    icon.style.border = '2px solid #229ED9';
+    icon.style.marginRight = '10px';
+    icon.style.background = item.classList.contains('reached') ? '#e6fce6' : '#fff';
 
-  item.style.alignItems = 'center';
-  item.appendChild(icon);
-  item.appendChild(text);
-  list.appendChild(item);
-}
+    const text = document.createElement('div');
+    const ducks = `${i}к 🐥`;
+    const reward = rewardMap[i] || fixedRewards[i];
+    text.innerHTML = `<strong>${ducks}</strong> — ${reward}`;
 
+    item.style.alignItems = 'center';
+    item.style.display = 'flex';
+
+    item.appendChild(icon);
+    item.appendChild(text);
+    list.appendChild(item);
+  }
+
+  // --- История
   const entry = `
     <div class="history-item">
       <img src="${myInfo.avatar}" />
@@ -514,13 +522,13 @@ function updateUI() {
     </div>`;
   document.getElementById('history').insertAdjacentHTML('afterbegin', entry);
 
-  if (currentLevel >= lastRewardLevel && currentLevel <= 10) {
+  const currentLevel = Math.floor(state.total / 10);
+  if (currentLevel === lastRewardLevel + 1 && currentLevel <= 10) {
     lastRewardLevel = currentLevel;
-
     const reward = fixedRewards[currentLevel];
     if (reward) {
       rewardMap[currentLevel] = reward;
-      document.getElementById('rewardLevel').textContent = currentLevel * 1000;
+      document.getElementById('rewardLevel').textContent = currentLevel * 10;
       document.getElementById('prizeText').innerHTML = `<strong>${reward}</strong>`;
       toggleModal('reward');
     }
@@ -547,19 +555,18 @@ function createDuckAnimation() {
   const duck = document.createElement('img');
   duck.src = 'duck.gif';
   duck.className = 'duck-animation';
-  duck.style.width = '40px';   // ⬅️ меньше
+  duck.style.width = '40px';
   duck.style.height = '40px';
 
-  const dx = (Math.random() - 0.5) * 200;  // ⬅️ меньше разброс
-  const dy = -120 - Math.random() * 100;
-
+  const dx = (Math.random() - 0.5) * 200;
+  const dy = -100 - Math.random() * 150;
   duck.style.setProperty('--x', `${dx}px`);
   duck.style.setProperty('--y', `${dy}px`);
   duck.style.left = `${rect.left + rect.width / 2 - 20}px`;
   duck.style.top = `${rect.top - 20}px`;
 
   document.body.appendChild(duck);
-  setTimeout(() => duck.remove(), 2000); // чуть короче
+  setTimeout(() => duck.remove(), 1800);
 }
 
 function claimReward() {
